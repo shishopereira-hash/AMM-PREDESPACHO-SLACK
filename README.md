@@ -3,9 +3,11 @@
 Imágenes del predespacho y redespacho semanal de la AMM (línea gráfica ER), publicadas en el canal **#despacho-semanal** de Slack.
 
 ## Cómo funciona
-1. Se sube el Excel de la AMM a `data/2026/` con su nombre original
-   (`NN_PDSyyyymmdd.xlsx` o `NN_PDSREPyyyymmdd(k).xlsx`).
-2. GitHub Actions detecta el archivo nuevo, genera la imagen y la publica en Slack con un resumen.
+1. GitHub Actions revisa la AMM (`pds.php`, la misma lista de *Planificación → Semanales → Despacho Semanal*):
+   cada 10 min los viernes de 3 a 6 PM y cada hora de 6 AM a 10 PM los demás días.
+2. Si hay un predespacho o redespacho nuevo, lo descarga a `data/2026/`
+   (`NN_PDSyyyymmdd.xlsx` o `NN_PDSREPyyyymmdd(k).xlsx`), genera la imagen y la publica en Slack con un resumen.
+   También se puede subir un Excel a mano a `data/2026/` y se publica igual.
 3. La imagen queda en `imagenes/2026/` y el archivo se anota en `data/publicados.txt`.
 
 - **Predespacho:** se compara contra la semana anterior vigente (original + redespachos).
