@@ -1,0 +1,56 @@
+name: Publicar predespacho / redespacho en Slack
+
+on:
+  # Se ejecuta cuando se sube un Excel nuevo de la AMM a data/
+  push:
+    paths:
+      - "data/**.xlsx"
+  # Botón "Run workflow" en la pestaña Actions (para probar o re-publicar)
+  workflow_dispatch:
+    inputs:
+      forzar:
+        description: "Nombre exacto de un Excel para volver a publicarlo (opcional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install openpyxl requests playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Generar imágenes y publicar en Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          if [ -n "${{ github.event.inputs.forzar }}" ]; then
+            python scripts/publicar.py --forzar "${{ github.event.inputs.forzar }}"
+          else
+            python scripts/publicar.py
+          fi
+
+      - name: Guardar imágenes y registro en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add imagenes/ data/publicados.txt
+          git diff --cached --quiet || (git commit -m "Imágenes publicadas en Slack" && git push)
