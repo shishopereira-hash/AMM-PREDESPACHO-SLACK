@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests
+      - run: pip install requests openpyxl
       - name: Revisar la AMM y descargar archivos nuevos
         id: desc
         run: python scripts/descargar.py

@@ -44,6 +44,26 @@ def listar(domingo):
     return anio, sem, links
 
 
+def huella(fuente, nombre):
+    """Resumen del contenido (días, demanda y energía por planta) para detectar el mismo archivo editado."""
+    import sys, tempfile
+    sys.path.insert(0, str(ROOT / 'programa'))
+    from parse_pds import parse_file
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td) / nombre
+        tmp.write_bytes(fuente if isinstance(fuente, bytes) else Path(fuente).read_bytes())
+        d = parse_file(tmp)
+    return (tuple(d['days']), round(sum(d['dem_energy'] or []), 1),
+            tuple(round(sum(p['daily']), 1) for p in d['plants']), tuple(d['obs']))
+
+
+def mismo_contenido(path, content):
+    try:
+        return huella(path, path.name) == huella(content, path.name)
+    except Exception:
+        return False
+
+
 def main():
     reg = json.loads(REG.read_text(encoding='utf-8')) if REG.exists() else {}
     nuevos = []
@@ -69,7 +89,7 @@ def main():
             wk, es_rep, fecha = int(m.group(1)), bool(m.group(2)), m.group(3)
             carpeta = DATA / str(anio); carpeta.mkdir(parents=True, exist_ok=True)
             igual = [f for f in carpeta.glob(f'{wk:02d}_PDS*.xlsx')
-                     if hashlib.sha256(f.read_bytes()).hexdigest() == h]
+                     if hashlib.sha256(f.read_bytes()).hexdigest() == h or mismo_contenido(f, b.content)]
             if igual:                                      # ya estaba (subido a mano o descargado antes)
                 reg[url] = {'sha256': h, 'local': igual[0].name}
                 continue

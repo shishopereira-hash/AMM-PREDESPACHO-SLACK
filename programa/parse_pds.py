@@ -102,6 +102,15 @@ def parse_file(path):
     out['dem_energy'] = sp('DEMANDA DE ENERGIA S.N.I')
     out['dem_power'] = sp('DEM. MAX POTENCIA')
     out['dem_energy_exp'] = sp('DEM. ENERGIA S.N.I. + EXPORTACIONES')
+    # Los redespachos de la AMM traen las 7 columnas, con ceros en los días que no cambian:
+    # se dejan solo los días con demanda programada (los días vigentes del redespacho).
+    if out['dem_energy'] and any(v > 0 for v in out['dem_energy']):
+        keep = [i for i, v in enumerate(out['dem_energy']) if v > 0]
+        if len(keep) < len(out['days']):
+            out['days'] = [out['days'][i] for i in keep]
+            for p in plants: p['daily'] = [p['daily'][i] for i in keep]
+            for f in ('dem_energy', 'dem_power', 'dem_energy_exp'):
+                if out[f]: out[f] = [out[f][i] for i in keep]
 
     # ---------- CVG ----------
     cvg = []
