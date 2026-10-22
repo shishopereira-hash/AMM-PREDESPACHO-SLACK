@@ -1,0 +1,11 @@
+{
+ "https://www.amm.org.gt/pdfs2/programas_despacho/02_PROGRAMAS_DE_DESPACHO_SEMANAL/2026/01_PROGRAMAS_DE_DESPACHO_SEMANAL/43_PDS20261018.xlsx": {
+  "sha256": "5d3045ca54035afbd8f134aefbe687fe45ec6cb786efab1b7279e95d2c12c2b7",
+  "local": "43_PDS20261018.xlsx"
+ },
+ "https://www.amm.org.gt/pdfs2/programas_despacho/02_PROGRAMAS_DE_DESPACHO_SEMANAL/2026/02_REPROGRAMACIONES_DE_DESPACHO_SEMANAL/43_PDSREP20261020.xlsx": {
+  "sha256": "f49cc821ff2efc76a84c8adb01adfdc4d3a04a654175b8278d0ddd665fb2bfd7",
+  "local": "43_PDSREP20261020(2).xlsx",
+  "descargado": "2026-10-22T17:04-06:00"
+ }
+}
