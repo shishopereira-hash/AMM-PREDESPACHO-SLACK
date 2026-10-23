@@ -111,5 +111,16 @@ def main():
     print('Nuevos:', nuevos or 'ninguno')
 
 
+def hay_proximo():
+    """True si ya está descargado el predespacho de la semana que empieza el próximo domingo."""
+    hoy = dt.datetime.now(GT).date()
+    dom = domingos_a_revisar(hoy)[1]
+    anio, sem = semana_amm(dom)
+    return (DATA / str(anio) / f'{sem:02d}_PDS{dom:%Y%m%d}.xlsx').exists()
+
+
 if __name__ == '__main__':
+    import sys
+    if '--hay-proximo' in sys.argv:
+        sys.exit(0 if hay_proximo() else 1)
     main()

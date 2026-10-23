@@ -4,7 +4,7 @@ Imágenes del predespacho y redespacho semanal de la AMM (línea gráfica ER), p
 
 ## Cómo funciona
 1. GitHub Actions revisa la AMM (`pds.php`, la misma lista de *Planificación → Semanales → Despacho Semanal*):
-   cada 10 min los viernes de 3 a 6 PM y cada hora de 6 AM a 10 PM los demás días.
+   los viernes revisa cada minuto desde las 2:35 PM hasta que sale el predespacho (workflow "Vigilar predespacho del viernes"), y cada hora de 6 AM a 10 PM para redespachos.
 2. Si hay un predespacho o redespacho nuevo, lo descarga a `data/2026/`
    (`NN_PDSyyyymmdd.xlsx` o `NN_PDSREPyyyymmdd(k).xlsx`), genera la imagen y la publica en Slack con un resumen.
    También se puede subir un Excel a mano a `data/2026/` y se publica igual.

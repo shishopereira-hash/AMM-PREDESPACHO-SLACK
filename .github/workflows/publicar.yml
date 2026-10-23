@@ -3,7 +3,6 @@ name: Publicar predespacho / redespacho en Slack
 on:
   schedule:
     # Horas en UTC (Guatemala = UTC-6)
-    - cron: "*/10 21-23 * * 5"    # viernes 3:00–5:50 PM: predespacho de la semana siguiente
     - cron: "7 12-23 * * *"       # todos los días, cada hora de 6 AM a 5 PM: redespachos
     - cron: "7 0-4 * * *"         # y de 6 PM a 10 PM
   # Si se sube un Excel a mano a data/

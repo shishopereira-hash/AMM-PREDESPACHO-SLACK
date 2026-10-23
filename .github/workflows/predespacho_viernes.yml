@@ -1,0 +1,52 @@
+name: Vigilar predespacho del viernes
+
+# La AMM publica el predespacho de la semana siguiente los viernes ~3:00 PM (Guatemala, UTC-6).
+# Este trabajo arranca antes con todo instalado y revisa la AMM cada minuto hasta que sale
+# (o hasta las 6:00 PM). Los redespachos de entre semana los sigue cubriendo "Publicar predespacho / redespacho en Slack".
+on:
+  schedule:
+    - cron: "35 20 * * 5"     # viernes 2:35 PM
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  vigilar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias
+        run: |
+          pip install openpyxl requests playwright
+          python -m playwright install --with-deps chromium
+      - name: Vigilar la AMM y publicar en cuanto salga
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          guardar() {
+            git add data/ imagenes/
+            git diff --cached --quiet && return 0
+            git commit -m "Predespacho publicado en Slack"
+            for i in 1 2 3; do git pull --rebase -q origin main && git push -q && return 0; sleep 5; done
+          }
+          # hasta las 6:00 PM de Guatemala (00:00 UTC del sábado)
+          while true; do
+            python scripts/descargar.py
+            python scripts/publicar.py
+            guardar
+            python scripts/descargar.py --hay-proximo && break
+            [ "$(date -u +%H)" -lt 20 ] && break
+            sleep 60
+          done
