@@ -70,8 +70,11 @@ def diverging(rows, label_key, maxabs, show_vals=True):
 def build_pos(c):
     d = c['date']
     dp = pct(c['dem_real'], c['dem_prog'])
-    title = (f"{DIAS[d.weekday()].capitalize()} {d.day} {MESES[d.month-1]}: demanda "
-             f"{abs(dp):.1f}% {'bajo' if dp < 0 else 'sobre'} lo programado")
+    dia = f"{DIAS[d.weekday()].capitalize()} {d.day} {MESES[d.month-1]}"
+    if abs(dp) < 0.1:      # diferencia prácticamente nula: no se muestra el porcentaje
+        title = f"{dia}: demanda igual a lo programado"
+    else:
+        title = f"{dia}: demanda {abs(dp):.1f}% {'bajo' if dp < 0 else 'sobre'} lo programado"
     subtitle = f"PosDespacho vs programa semanal (sem. {c['week']}) · {fecha_larga(d)}"
 
     kp = ''.join([
