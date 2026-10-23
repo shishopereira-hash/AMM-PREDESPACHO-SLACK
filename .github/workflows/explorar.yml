@@ -11,11 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           rm -rf explorar; mkdir -p explorar
-          curl -sL -A "Mozilla/5.0" "https://www.amm.org.gt/posdes.php?fecha=20261021&mes=10&anio=2026" -o explorar/posdes.html || true
-          cat explorar/posdes.html
-          for u in $(grep -oiE 'href="[^"]+\.(xlsx?|pdf|zip)"' explorar/posdes.html | cut -d'"' -f2 | sort -u); do
-            curl -sL -A "Mozilla/5.0" "$u" -o "explorar/$(basename "$u")" || true
-          done
+          curl -sL -A "Mozilla/5.0" "https://www.amm.org.gt/js/informes.js" -o explorar/informes.js || true
+          curl -sL -A "Mozilla/5.0" "https://www.amm.org.gt/diarios-vwp_resu.php" -o explorar/diarios_resu.html || true
+          curl -sL -A "Mozilla/5.0" "https://www.amm.org.gt/" -o explorar/home.html || true
           ls -la explorar
           git config user.name bot; git config user.email bot@x
           git add explorar && git commit -m explorar && git push origin explorar
