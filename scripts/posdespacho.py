@@ -94,6 +94,10 @@ def pendientes():
 
 
 if __name__ == '__main__':
+    if '--ayer-listo' in sys.argv:                # código 0 si el posdespacho de ayer ya se publicó
+        ayer = dt.datetime.now(GT).date() - dt.timedelta(days=1)
+        done = set(LOG.read_text(encoding='utf-8').split()) if LOG.exists() else set()
+        sys.exit(0 if f'{ayer:%Y%m%d}' in done else 1)
     if '--hay-pendientes' in sys.argv:            # código 0 si hay algo por publicar
         sys.exit(0 if pendientes() else 1)
     if '--revisar' in sys.argv:                  # solo descarga y avisa si hay algo pendiente

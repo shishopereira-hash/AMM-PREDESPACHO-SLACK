@@ -5,7 +5,10 @@ name: Vigilar predespacho del viernes
 # (o hasta las 6:00 PM). Los redespachos de entre semana los sigue cubriendo "Publicar predespacho / redespacho en Slack".
 on:
   schedule:
-    - cron: "35 20 * * 5"     # viernes 2:35 PM
+    # GitHub a veces atrasa o se salta arranques programados: se agendan varios; si uno ya está
+    # vigilando, los demás esperan y al arrancar ven que ya se publicó y terminan de inmediato.
+    - cron: "35,50 20 * * 5"          # viernes 2:35 y 2:50 PM
+    - cron: "5,20,35,50 21-23 * * 5"  # respaldo cada 15 min hasta las 5:50 PM
   workflow_dispatch: {}
 
 permissions:
@@ -41,6 +44,7 @@ jobs:
             git commit -m "Predespacho publicado en Slack"
             for i in 1 2 3; do git pull --rebase -q origin main && git push -q && return 0; sleep 5; done
           }
+          python scripts/descargar.py --hay-proximo && { echo "El predespacho de la próxima semana ya está"; exit 0; }
           # hasta las 6:00 PM de Guatemala (00:00 UTC del sábado)
           while true; do
             python scripts/descargar.py

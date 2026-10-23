@@ -5,7 +5,10 @@ name: Publicar posdespacho diario en Slack
 # y revisa la AMM cada minuto hasta que aparece (o hasta las 3:00 PM).
 on:
   schedule:
-    - cron: "35 17 * * *"     # 11:35 AM: inicia la vigilancia (GitHub puede atrasar el arranque unos minutos)
+    # GitHub a veces atrasa o se salta arranques programados: se agendan varios; si uno ya está
+    # vigilando, los demás esperan y al arrancar ven que ya se publicó y terminan de inmediato.
+    - cron: "35,50 17 * * *"         # 11:35 y 11:50 AM: inicia la vigilancia
+    - cron: "5,20,35,50 18-20 * * *" # respaldo cada 15 min hasta las 2:50 PM
     - cron: "17 21-23 * * *"  # 3–5 PM cada hora, por si la AMM se atrasa más
   workflow_dispatch:
     inputs:
@@ -52,6 +55,7 @@ jobs:
             python scripts/posdespacho.py --solo-publicar --forzar "$FORZAR"; guardar; exit 0
           fi
           # hasta las 3:00 PM de Guatemala (21:00 UTC) revisa cada minuto; fuera de ese rango, una sola revisión
+          python scripts/posdespacho.py --ayer-listo && { echo "El posdespacho de ayer ya se publicó"; exit 0; }
           while true; do
             python scripts/posdespacho.py --revisar
             if python scripts/posdespacho.py --hay-pendientes; then
