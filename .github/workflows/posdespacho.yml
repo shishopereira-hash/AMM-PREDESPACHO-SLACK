@@ -1,10 +1,12 @@
 name: Publicar posdespacho diario en Slack
 
+# La AMM publica el posdespacho del día anterior alrededor de las 12:00 PM (Guatemala, UTC-6).
+# Para publicarlo casi en cuanto sale, un trabajo arranca antes de las 12 con todo instalado
+# y revisa la AMM cada minuto hasta que aparece (o hasta las 3:00 PM).
 on:
   schedule:
-    # Horas en UTC (Guatemala = UTC-6). La AMM publica el posdespacho del día anterior ~12:00 PM.
-    - cron: "*/10 18-19 * * *"     # 12:00–1:50 PM cada 10 min
-    - cron: "17 20-23 * * *"       # 2 PM–5 PM cada hora (por si se atrasa)
+    - cron: "35 17 * * *"     # 11:35 AM: inicia la vigilancia (GitHub puede atrasar el arranque unos minutos)
+    - cron: "17 21-23 * * *"  # 3–5 PM cada hora, por si la AMM se atrasa más
   workflow_dispatch:
     inputs:
       forzar:
@@ -16,38 +18,15 @@ permissions:
   contents: write
 
 concurrency:
-  group: publicar
+  group: posdespacho
   cancel-in-progress: false
 
 jobs:
-  revisar:
+  vigilar:
     runs-on: ubuntu-latest
-    outputs:
-      pendientes: ${{ steps.rev.outputs.pendientes }}
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests openpyxl
-      - name: Revisar la AMM y descargar posdespachos nuevos
-        id: rev
-        run: python scripts/posdespacho.py --revisar
-      - name: Guardar archivos descargados
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git diff --cached --quiet || (git commit -m "AMM: posdespacho nuevo" && git push)
-
-  publicar:
-    needs: revisar
-    if: needs.revisar.outputs.pendientes == 'true' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -55,19 +34,32 @@ jobs:
         run: |
           pip install openpyxl requests playwright
           python -m playwright install --with-deps chromium
-      - name: Generar imagen y publicar en Slack
+      - name: Vigilar la AMM y publicar en cuanto salga
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-        run: |
-          if [ -n "${{ github.event.inputs.forzar }}" ]; then
-            python scripts/posdespacho.py --solo-publicar --forzar "${{ github.event.inputs.forzar }}"
-          else
-            python scripts/posdespacho.py --solo-publicar
-          fi
-      - name: Guardar imágenes y registro
+          FORZAR: ${{ github.event.inputs.forzar }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add imagenes/ data/publicados_pos.txt
-          git diff --cached --quiet || (git commit -m "Posdespacho publicado en Slack" && git push)
+          guardar() {
+            git add data/ imagenes/
+            git diff --cached --quiet && return 0
+            git commit -m "Posdespacho publicado en Slack"
+            for i in 1 2 3; do git pull --rebase -q origin main && git push -q && return 0; sleep 5; done
+          }
+          if [ -n "$FORZAR" ]; then
+            python scripts/posdespacho.py --solo-publicar --forzar "$FORZAR"; guardar; exit 0
+          fi
+          # hasta las 3:00 PM de Guatemala (21:00 UTC) revisa cada minuto; fuera de ese rango, una sola revisión
+          while true; do
+            python scripts/posdespacho.py --revisar
+            if python scripts/posdespacho.py --hay-pendientes; then
+              python scripts/posdespacho.py --solo-publicar
+              guardar
+              break
+            fi
+            [ "$(date -u +%H)" -ge 21 ] && break
+            [ "$(date -u +%H)" -lt 17 ] && break
+            sleep 60
+          done

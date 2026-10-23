@@ -94,6 +94,8 @@ def pendientes():
 
 
 if __name__ == '__main__':
+    if '--hay-pendientes' in sys.argv:            # código 0 si hay algo por publicar
+        sys.exit(0 if pendientes() else 1)
     if '--revisar' in sys.argv:                  # solo descarga y avisa si hay algo pendiente
         descargar()
         p = pendientes()
