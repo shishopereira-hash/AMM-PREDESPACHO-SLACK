@@ -1,0 +1,73 @@
+name: Publicar posdespacho diario en Slack
+
+on:
+  schedule:
+    # Horas en UTC (Guatemala = UTC-6). La AMM publica el posdespacho del día anterior ~12:00 PM.
+    - cron: "*/10 18-19 * * *"     # 12:00–1:50 PM cada 10 min
+    - cron: "17 20-23 * * *"       # 2 PM–5 PM cada hora (por si se atrasa)
+  workflow_dispatch:
+    inputs:
+      forzar:
+        description: "Fecha AAAAMMDD de un posdespacho para volver a publicarlo (opcional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    outputs:
+      pendientes: ${{ steps.rev.outputs.pendientes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests openpyxl
+      - name: Revisar la AMM y descargar posdespachos nuevos
+        id: rev
+        run: python scripts/posdespacho.py --revisar
+      - name: Guardar archivos descargados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || (git commit -m "AMM: posdespacho nuevo" && git push)
+
+  publicar:
+    needs: revisar
+    if: needs.revisar.outputs.pendientes == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias
+        run: |
+          pip install openpyxl requests playwright
+          python -m playwright install --with-deps chromium
+      - name: Generar imagen y publicar en Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          if [ -n "${{ github.event.inputs.forzar }}" ]; then
+            python scripts/posdespacho.py --solo-publicar --forzar "${{ github.event.inputs.forzar }}"
+          else
+            python scripts/posdespacho.py --solo-publicar
+          fi
+      - name: Guardar imágenes y registro
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add imagenes/ data/publicados_pos.txt
+          git diff --cached --quiet || (git commit -m "Posdespacho publicado en Slack" && git push)

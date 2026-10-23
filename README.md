@@ -26,3 +26,13 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
 - Costo = energía diaria × CVG vigente ese día (hoja CVG). LA UNIÓN B1 = LUN-B.
 - Mantenimientos: se leen todas las filas de la hoja.
 - Nota AMM del redespacho = observaciones nuevas respecto a la versión anterior.
+
+## PosDespacho diario
+- La AMM publica cada día (~12:00 PM) el posdespacho del día anterior en
+  `pdfs2/post_despacho/POSDESPACHO_DIARIO/AAAA/MM_MES/PDaaaammdd.zip`.
+- `scripts/posdespacho.py` lo descarga a `data/posdespacho/AAAA/`, lo compara contra el programa semanal
+  vigente (original + redespachos de esa semana) y publica la imagen `imagenes/AAAA/PD_aaaammdd.png` en Slack.
+- Workflow: *Publicar posdespacho diario en Slack* (cada 10 min de 12:00 a 1:50 PM y cada hora hasta las 5 PM).
+- Criterios: hidroeléctricas sin Chixoy (Chixoy aparte); 3 desviaciones positivas y 3 negativas por tecnología;
+  la importación de oportunidad de México = importación total desde México − Energía del Caribe;
+  el intercambio MER no se compara; plantas en cascada/bloques/unidades se suman (Renace I–IV, INDE, Xacbal + Delta, Jaguar, Pantaleón...).
