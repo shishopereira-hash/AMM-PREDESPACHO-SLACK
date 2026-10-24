@@ -35,7 +35,7 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
     disparos de 230/400 kV (≥60 min o con carga afectada); varias subestaciones sin tensión ≥30 min;
     disparo de interconexión con RRA convocada; salida forzada de una unidad ≥100 MW.
 - Cada alarma trae nivel, hora, el dato (MW, kV, minutos) y el texto del RSO.
-- Días sin emergencias ni graves: no se publica nada. Registro en `data/publicados_alarmas.txt`.
+- Días sin emergencias ni graves: se publica un aviso corto "✅ Sin emergencias ni graves en el SNI el …". Registro en `data/publicados_alarmas.txt`.
 - Umbrales: `UMBRAL` en `programa/clasificador_eventos.py`. Potencia por central: `data/centrales_mw.json`.
 - Secreto extra: `SLACK_ALARMAS_CHANNEL` = ID del canal #alarmas-sni (la app debe estar invitada al canal).
 - Probar un día: *Actions → Alarmas del SNI en Slack → Run workflow* con la fecha `AAAAMMDD`

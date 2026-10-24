@@ -2,7 +2,7 @@ name: Alarmas del SNI en Slack
 
 # Todos los días a las 2:00 PM (Guatemala, UTC-6 = 20:00 UTC) revisa el posdespacho de ayer
 # (hojas RSO e Indisponibilidades) y publica en #alarmas-sni solo las EMERGENCIAS y los GRAVES.
-# Si el día no tuvo ninguno, no se publica nada (queda anotado en data/publicados_alarmas.txt).
+# Si el día no tuvo ninguno, se publica un aviso corto de "sin emergencias ni graves" (queda anotado en data/publicados_alarmas.txt).
 on:
   schedule:
     - cron: "0 20 * * *"            # 2:00 PM

@@ -1,5 +1,5 @@
 """Alarmas del SNI: lee el posdespacho de ayer (RSO e Indisponibilidades), clasifica cada evento
-y publica en Slack (#alarmas-sni) solo lo que sea EMERGENCIA o GRAVE.
+y publica en Slack (#alarmas-sni) lo que sea EMERGENCIA o GRAVE; si no hubo, un aviso corto de "sin alarmas".
 
 - Usa el Excel que deja scripts/posdespacho.py en data/posdespacho/AAAA/PDaaaammdd.xlsx;
   si todavía no está, lo descarga de la AMM.
@@ -129,8 +129,15 @@ def correr(d, prueba=False, forzar=False):
         print(f'{tag}: el posdespacho todavía no está en la AMM'); return False
     eventos = clasificar_dia(f, d)
     if not eventos:
-        print(f'{tag}: sin emergencias ni graves; no se publica nada')
-        if not prueba: anotar(tag, 'sin-alarmas')
+        fecha = f'{DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]} de {d.year}'
+        texto = f'✅ Sin emergencias ni graves en el SNI el {fecha}'
+        blocks = [{'type': 'section', 'text': {'type': 'mrkdwn', 'text': f'✅ *Sin emergencias ni graves* en el SNI el *{fecha}*'}},
+                  {'type': 'context', 'elements': [{'type': 'mrkdwn',
+                   'text': 'Revisado el posdespacho AMM (RSO e Indisponibilidades).'}]}]
+        if prueba:
+            print(texto); return True
+        if slack_post(texto, blocks):
+            anotar(tag, 'sin-alarmas'); print(f'{tag}: publicado "sin alarmas" en Slack')
         return True
     texto, blocks = mensaje(d, eventos)
     if prueba:
