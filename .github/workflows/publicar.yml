@@ -47,7 +47,8 @@ jobs:
 
   publicar:
     needs: revisar
-    if: needs.revisar.outputs.nuevos == 'true' || github.event_name != 'schedule'
+    # Solo se arma la imagen si hay algo nuevo, si se subió un Excel a mano o si se pidió re-publicar uno
+    if: needs.revisar.outputs.nuevos == 'true' || github.event_name == 'push' || github.event.inputs.forzar != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
