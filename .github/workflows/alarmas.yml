@@ -1,0 +1,53 @@
+name: Alarmas del SNI en Slack
+
+# Todos los días a las 2:00 PM (Guatemala, UTC-6 = 20:00 UTC) revisa el posdespacho de ayer
+# (hojas RSO e Indisponibilidades) y publica en #alarmas-sni solo las EMERGENCIAS y los GRAVES.
+# Si el día no tuvo ninguno, no se publica nada (queda anotado en data/publicados_alarmas.txt).
+on:
+  schedule:
+    - cron: "0 20 * * *"            # 2:00 PM
+    - cron: "40 20-23 * * *"        # respaldos (GitHub a veces atrasa los cron, o la AMM se atrasa)
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fecha AAAAMMDD de la operación a revisar y publicar otra vez (opcional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: alarmas
+  cancel-in-progress: false
+
+jobs:
+  alarmas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install openpyxl requests
+      - name: Revisar el posdespacho y publicar alarmas
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_ALARMAS_CHANNEL: ${{ secrets.SLACK_ALARMAS_CHANNEL }}
+          FECHA: ${{ github.event.inputs.fecha }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$FECHA" ]; then
+            python scripts/alarmas.py --fecha "$FECHA"
+          else
+            python scripts/alarmas.py --ayer-listo && { echo "Lo de ayer ya se revisó"; exit 0; }
+            python scripts/alarmas.py || { [ $? -eq 3 ] && echo "La AMM todavía no publica el posdespacho; se reintenta en el siguiente horario" && exit 0; exit 1; }
+          fi
+          # solo se guarda el registro (el Excel lo guarda el workflow del posdespacho)
+          git add data/publicados_alarmas.txt 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Alarmas SNI revisadas"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q && exit 0; sleep 5; done
+          exit 1

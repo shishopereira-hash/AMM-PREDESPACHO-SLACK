@@ -27,6 +27,20 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
 - Mantenimientos: se leen todas las filas de la hoja.
 - Nota AMM del redespacho = observaciones nuevas respecto a la versión anterior.
 
+## Alarmas del SNI (#alarmas-sni)
+- Workflow *Alarmas del SNI en Slack*: todos los días a las **2:00 PM** revisa el posdespacho de ayer
+  (hojas RSO e Indisponibilidades) con `scripts/alarmas.py` y publica en **#alarmas-sni** solo:
+  - 🔴 **EMERGENCIA**: ≥100 MW de carga desconectada en Guatemala, o ≥150 MW de generación/importación perdida.
+  - 🟠 **GRAVE**: EDACBF; 20–100 MW de carga; 50–150 MW de generación; medidas NCC-10; corte manual de carga;
+    disparos de 230/400 kV (≥60 min o con carga afectada); varias subestaciones sin tensión ≥30 min;
+    disparo de interconexión con RRA convocada; salida forzada de una unidad ≥100 MW.
+- Cada alarma trae nivel, hora, el dato (MW, kV, minutos) y el texto del RSO.
+- Días sin emergencias ni graves: no se publica nada. Registro en `data/publicados_alarmas.txt`.
+- Umbrales: `UMBRAL` en `programa/clasificador_eventos.py`. Potencia por central: `data/centrales_mw.json`.
+- Secreto extra: `SLACK_ALARMAS_CHANNEL` = ID del canal #alarmas-sni (la app debe estar invitada al canal).
+- Probar un día: *Actions → Alarmas del SNI en Slack → Run workflow* con la fecha `AAAAMMDD`
+  (en local: `python scripts/alarmas.py --fecha 20260607 --prueba`).
+
 ## PosDespacho diario
 - La AMM publica cada día (~12:00 PM) el posdespacho del día anterior en
   `pdfs2/post_despacho/POSDESPACHO_DIARIO/AAAA/MM_MES/PDaaaammdd.zip`.

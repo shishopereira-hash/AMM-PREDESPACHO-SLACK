@@ -1,0 +1,656 @@
+{
+"ACG-G": {
+"nombre": "Actun Can Generación",
+"mw_central": 2.6,
+"unidades": 1,
+"mw_unidad": 2.6
+},
+"AGU-H": {
+"nombre": "Hidroeléctrica Aguacapa",
+"mw_central": 81.3,
+"unidades": 3,
+"mw_unidad": 27.1
+},
+"ARI-O": {
+"nombre": "Arizona",
+"mw_central": 158.3,
+"unidades": 10,
+"mw_unidad": 15.8
+},
+"ARI-V": {
+"nombre": "Arizona Vapor 1",
+"mw_central": 1.9,
+"unidades": 1,
+"mw_unidad": 1.9
+},
+"BVT-B": {
+"nombre": "Biogás del Vertedero del Trebol",
+"mw_central": 0.8,
+"unidades": 1,
+"mw_unidad": 0.8
+},
+"CAF-H": {
+"nombre": "El Cafetal",
+"mw_central": 8.5,
+"unidades": 2,
+"mw_unidad": 4.2
+},
+"CAL-G": {
+"nombre": "Geotérmica Calderas",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"CAN-H": {
+"nombre": "Hidroeléctrica Hidro Canadá",
+"mw_central": 45.9,
+"unidades": 2,
+"mw_unidad": 22.9
+},
+"CBN-H": {
+"nombre": "Hidroeléctrica El Cobano",
+"mw_central": 9.2,
+"unidades": 2,
+"mw_unidad": 4.6
+},
+"CGP-B": {
+"nombre": "Central Generadora Progreso Bunker",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"CGP-D": {
+"nombre": "Central Generadora Progreso Diesel",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"CHO-H": {
+"nombre": "Hidroeléctrica Choloma",
+"mw_central": 9.6,
+"unidades": 1,
+"mw_unidad": 9.6
+},
+"CHX-H": {
+"nombre": "Hidroeléctrica Chixoy",
+"mw_central": 286.9,
+"unidades": 5,
+"mw_unidad": 57.4
+},
+"CND-H": {
+"nombre": "Hidroeléctrica Candelaria",
+"mw_central": 4.5,
+"unidades": 1,
+"mw_unidad": 4.5
+},
+"COE-D": {
+"nombre": "Coenesa Diesel",
+"mw_central": 0.0,
+"unidades": 1,
+"mw_unidad": null
+},
+"CON-B": {
+"nombre": "Ingenio Concepción",
+"mw_central": 0.0,
+"unidades": 1,
+"mw_unidad": null
+},
+"CRZ-F": {
+"nombre": "El Carrizo",
+"mw_central": 62.0,
+"unidades": 1,
+"mw_unidad": 62.0
+},
+"DAR-B": {
+"nombre": "",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"ECR-B": {
+"nombre": "Electrogeneración Cristal",
+"mw_central": 3.2,
+"unidades": 1,
+"mw_unidad": 3.2
+},
+"ELG-B": {
+"nombre": "Electro Generación",
+"mw_central": 14.4,
+"unidades": 2,
+"mw_unidad": 7.2
+},
+"EPI-B": {
+"nombre": "Ingenio El Pilar",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"ESC-V": {
+"nombre": "Térmica Escuintla Vapor",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"FLO-H": {
+"nombre": "Hidroeléctrica Finca Lorena",
+"mw_central": 4.5,
+"unidades": 2,
+"mw_unidad": 2.2
+},
+"GAT-B": {
+"nombre": "Generadora del Atlántico Vapor",
+"mw_central": 0.6,
+"unidades": 2,
+"mw_unidad": 0.3
+},
+"GCS-C": {
+"nombre": "Generadora Costa Sur",
+"mw_central": 30.4,
+"unidades": 1,
+"mw_unidad": 30.4
+},
+"GEN-B": {
+"nombre": "Genor",
+"mw_central": 39.6,
+"unidades": 4,
+"mw_unidad": 9.9
+},
+"GGO-B": {
+"nombre": "Planta Generadora GENOSA",
+"mw_central": 11.8,
+"unidades": 3,
+"mw_unidad": 3.9
+},
+"GSL-C": {
+"nombre": "Generadora Santa Lucía",
+"mw_central": 44.7,
+"unidades": 1,
+"mw_unidad": 44.7
+},
+"HAG-H": {
+"nombre": "Hidroeléctrica Hidroaguná",
+"mw_central": 2.0,
+"unidades": 1,
+"mw_unidad": 2.0
+},
+"HCR-H": {
+"nombre": "Hidroeléctrica Coralito",
+"mw_central": 1.9,
+"unidades": 1,
+"mw_unidad": 1.9
+},
+"HCV-H": {
+"nombre": "Hidroeléctrica Cerro Vivo",
+"mw_central": 2.1,
+"unidades": 1,
+"mw_unidad": 2.1
+},
+"HEL-H": {
+"nombre": "Hidroeléctrica El Libertador",
+"mw_central": 0.0,
+"unidades": 1,
+"mw_unidad": null
+},
+"HGY-H": {
+"nombre": "Hidroeléctrica Guayacán",
+"mw_central": 2.9,
+"unidades": 2,
+"mw_unidad": 1.4
+},
+"HHS-H": {
+"nombre": "Hidroeléctrica Hidropower SDMM, S. A",
+"mw_central": 2.1,
+"unidades": 1,
+"mw_unidad": 2.1
+},
+"HIX-H": {
+"nombre": "Hidroeléctrica Ixtalito",
+"mw_central": 1.6,
+"unidades": 1,
+"mw_unidad": 1.6
+},
+"HKC-H": {
+"nombre": "Kaplan Chapina",
+"mw_central": 1.8,
+"unidades": 1,
+"mw_unidad": 1.8
+},
+"HLP-H": {
+"nombre": "Hidroeléctrica La Perla",
+"mw_central": 3.8,
+"unidades": 1,
+"mw_unidad": 3.8
+},
+"HMA-H": {
+"nombre": "Hidroeléctrica Maxanal",
+"mw_central": 2.1,
+"unidades": 1,
+"mw_unidad": 2.1
+},
+"HPT-H": {
+"nombre": "GDR Hidroeléctrica Los Patos",
+"mw_central": 4.8,
+"unidades": 2,
+"mw_unidad": 2.4
+},
+"HSM-H": {
+"nombre": "Hidroeléctrica Salto Marinalá",
+"mw_central": 4.9,
+"unidades": 3,
+"mw_unidad": 1.6
+},
+"HST-H": {
+"nombre": "Central GDR Hidroeléctrica Santa Teresa",
+"mw_central": 2.0,
+"unidades": 1,
+"mw_unidad": 2.0
+},
+"HUV-H": {
+"nombre": "Central Hidroeléctrica Las Uvitas",
+"mw_central": 1.8,
+"unidades": 1,
+"mw_unidad": 1.8
+},
+"HXO-H": {
+"nombre": "Pequeña Hidroeléctrica Xolhuitz",
+"mw_central": 2.3,
+"unidades": 1,
+"mw_unidad": 2.3
+},
+"INT-B": {
+"nombre": "Central Inteccsa Bunker",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"INT-D": {
+"nombre": "Central Inteccsa Diesel",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"INV-G": {
+"nombre": "Planta Innova Gas Natural",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"ISI-B": {
+"nombre": "Ingenio San Isidro",
+"mw_central": 57.6,
+"unidades": 1,
+"mw_unidad": 57.6
+},
+"JUR-H": {
+"nombre": "Hidroeléctrica Jurún Marinalá",
+"mw_central": 60.4,
+"unidades": 3,
+"mw_unidad": 20.1
+},
+"LCU-E": {
+"nombre": "Proyecto Eólico Las Cumbres de Agua Blanca",
+"mw_central": 31.5,
+"unidades": 15,
+"mw_unidad": 2.1
+},
+"LES-H": {
+"nombre": "Hidroeléctrica Los Esclavos",
+"mw_central": 13.5,
+"unidades": 1,
+"mw_unidad": 13.5
+},
+"LFU-H": {
+"nombre": "Las Fuentes II",
+"mw_central": 13.7,
+"unidades": 1,
+"mw_unidad": 13.7
+},
+"LIB-H": {
+"nombre": "Hidroeléctrica La libertad",
+"mw_central": 9.5,
+"unidades": 1,
+"mw_unidad": 9.5
+},
+"LLI-C": {
+"nombre": "La Libertad",
+"mw_central": 17.3,
+"unidades": 1,
+"mw_unidad": 17.3
+},
+"LPA-C": {
+"nombre": "Palmas II",
+"mw_central": 73.5,
+"unidades": 2,
+"mw_unidad": 36.8
+},
+"LUN-B": {
+"nombre": "Ingenio La Unión Bloque 1",
+"mw_central": 24.3,
+"unidades": 1,
+"mw_unidad": 24.3
+},
+"LVA-H": {
+"nombre": "Hidroeléctrica Río Las Vacas",
+"mw_central": 41.4,
+"unidades": 3,
+"mw_unidad": 13.8
+},
+"MSO-F": {
+"nombre": "Magdalena Solar",
+"mw_central": 50.0,
+"unidades": 1,
+"mw_unidad": 50.0
+},
+"MTI-B": {
+"nombre": "Ingenio Madre Tierra",
+"mw_central": 12.5,
+"unidades": 1,
+"mw_unidad": 12.5
+},
+"MTO-H": {
+"nombre": "Hidroeléctrica Montecristo",
+"mw_central": 13.0,
+"unidades": 2,
+"mw_unidad": 6.5
+},
+"MTZ-H": {
+"nombre": "Hidroeléctrica Matanzas",
+"mw_central": 11.8,
+"unidades": 1,
+"mw_unidad": 11.8
+},
+"OCT-G": {
+"nombre": "Planta de Generación Ocultún",
+"mw_central": 12.9,
+"unidades": 12,
+"mw_unidad": 1.1
+},
+"ORT-G": {
+"nombre": "Geotérmica Ortitlán",
+"mw_central": 16.3,
+"unidades": 3,
+"mw_unidad": 5.4
+},
+"OX2-H": {
+"nombre": "Oxec",
+"mw_central": 59.9,
+"unidades": 3,
+"mw_unidad": 20.0
+},
+"OXE-H": {
+"nombre": "Oxec II",
+"mw_central": 24.7,
+"unidades": 2,
+"mw_unidad": 12.3
+},
+"OXL-G": {
+"nombre": "Planta Generadora con Gas Natural OOXOL",
+"mw_central": 9.4,
+"unidades": 4,
+"mw_unidad": 2.4
+},
+"PAL-H": {
+"nombre": "Hidroeléctrica Palin 2",
+"mw_central": 4.2,
+"unidades": 2,
+"mw_unidad": 2.1
+},
+"PAS-H": {
+"nombre": "Hidroeléctrica Pasabien",
+"mw_central": 12.6,
+"unidades": 1,
+"mw_unidad": 12.6
+},
+"PGO-B": {
+"nombre": "Ingenio Palo Gordo",
+"mw_central": 26.3,
+"unidades": 1,
+"mw_unidad": 26.3
+},
+"PNA-H": {
+"nombre": "Hidroeléctrica Panan",
+"mw_central": 7.5,
+"unidades": 3,
+"mw_unidad": 2.5
+},
+"POR-H": {
+"nombre": "Hidroeléctrica El Porvenir",
+"mw_central": 2.1,
+"unidades": 1,
+"mw_unidad": 2.1
+},
+"PQP-B": {
+"nombre": "Puerto Quetzal Power",
+"mw_central": 50.8,
+"unidades": 12,
+"mw_unidad": 4.2
+},
+"PVE-H": {
+"nombre": "Hidroeléctrica Posa Verde",
+"mw_central": 9.9,
+"unidades": 3,
+"mw_unidad": 3.3
+},
+"PVI-H": {
+"nombre": "Hidroeléctrica Palo Viejo",
+"mw_central": 88.2,
+"unidades": 2,
+"mw_unidad": 44.1
+},
+"PWT-B": {
+"nombre": "Poliwatt",
+"mw_central": 0.0,
+"unidades": 5,
+"mw_unidad": null
+},
+"RAA-H": {
+"nombre": "Hidroeléctrica Raaxha",
+"mw_central": 5.0,
+"unidades": 2,
+"mw_unidad": 2.5
+},
+"RBO-H": {
+"nombre": "Hidroeléctrica Río Bobos",
+"mw_central": 10.3,
+"unidades": 1,
+"mw_unidad": 10.3
+},
+"RC2-H": {
+"nombre": "Hidroeléctrica El Recreo II",
+"mw_central": 22.0,
+"unidades": 2,
+"mw_unidad": 11.0
+},
+"RE2-H": {
+"nombre": "Hidroeléctrica Renace II",
+"mw_central": 107.2,
+"unidades": 4,
+"mw_unidad": 26.8
+},
+"RE3-H": {
+"nombre": "Hidroeléctrica Renace III",
+"mw_central": 67.0,
+"unidades": 3,
+"mw_unidad": 22.3
+},
+"RE4-H": {
+"nombre": "Hidroeléctrica Renace IV",
+"mw_central": 51.2,
+"unidades": 2,
+"mw_unidad": 25.6
+},
+"REC-H": {
+"nombre": "Hidroeléctrica El Recreo",
+"mw_central": 25.3,
+"unidades": 2,
+"mw_unidad": 12.7
+},
+"REN-H": {
+"nombre": "Hidroeléctrica Renace",
+"mw_central": 65.2,
+"unidades": 3,
+"mw_unidad": 21.7
+},
+"S&S-D": {
+"nombre": "Stewart & Stevenson",
+"mw_central": 0.0,
+"unidades": 1,
+"mw_unidad": null
+},
+"SAA-B": {
+"nombre": "Ingenio Santa Ana",
+"mw_central": 23.9,
+"unidades": 2,
+"mw_unidad": 11.9
+},
+"SAL-H": {
+"nombre": "Hidroeléctrica EL Salto",
+"mw_central": 3.6,
+"unidades": 2,
+"mw_unidad": 1.8
+},
+"SDT-F": {
+"nombre": "Solarium Delta",
+"mw_central": 10.0,
+"unidades": 1,
+"mw_unidad": 10.0
+},
+"SEC-H": {
+"nombre": "Hidroeléctrica Secacao",
+"mw_central": 16.1,
+"unidades": 1,
+"mw_unidad": 16.1
+},
+"SES-F": {
+"nombre": "Santo Espíritu",
+"mw_central": 109.0,
+"unidades": 1,
+"mw_unidad": 109.0
+},
+"SID-B": {
+"nombre": "Sidegua",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"SIS-H": {
+"nombre": "Hidroeléctrica San Isidro",
+"mw_central": 3.4,
+"unidades": 2,
+"mw_unidad": 1.7
+},
+"SJO-C": {
+"nombre": "San José",
+"mw_central": 134.5,
+"unidades": 1,
+"mw_unidad": 134.5
+},
+"SLR-F": {
+"nombre": "Solarium",
+"mw_central": 40.0,
+"unidades": 1,
+"mw_unidad": 40.0
+},
+"SMA-H": {
+"nombre": "Hidroeléctrica Santa María",
+"mw_central": 6.0,
+"unidades": 3,
+"mw_unidad": 2.0
+},
+"SNT-E": {
+"nombre": "Central Generadora San Antonio El Sitio",
+"mw_central": null,
+"unidades": 16,
+"mw_unidad": null
+},
+"STS-H": {
+"nombre": "Hidroeléctrica Santa Teresa",
+"mw_central": 16.8,
+"unidades": 2,
+"mw_unidad": 8.4
+},
+"TER-B": {
+"nombre": "Térmica Unidad 1",
+"mw_central": 14.1,
+"unidades": 4,
+"mw_unidad": 3.5
+},
+"TSO-F": {
+"nombre": "Tierra del Sol",
+"mw_central": 75.0,
+"unidades": 1,
+"mw_unidad": 75.0
+},
+"VBL-E": {
+"nombre": "Viento Blanco",
+"mw_central": 23.1,
+"unidades": 7,
+"mw_unidad": 3.3
+},
+"VDA-H": {
+"nombre": "Visión del Águila, S. A",
+"mw_central": 2.1,
+"unidades": 2,
+"mw_unidad": 1.1
+},
+"XAC-H": {
+"nombre": "Hidro Xacbal",
+"mw_central": 98.0,
+"unidades": 2,
+"mw_unidad": 49.0
+},
+"XAD-H": {
+"nombre": "Hidro Xacbal Delta",
+"mw_central": 59.0,
+"unidades": 2,
+"mw_unidad": 29.5
+},
+"YOL-F": {
+"nombre": "Proyecto Fotovoltaico Yolanda",
+"mw_central": 61.0,
+"unidades": 1,
+"mw_unidad": 61.0
+},
+"ZUN-G": {
+"nombre": "Geotérmica Orzunil",
+"mw_central": 16.4,
+"unidades": 8,
+"mw_unidad": 2.0
+},
+"EDC-I": {
+"nombre": "ENERGÍA DEL CARIBE",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"GAT-V": {
+"nombre": "GAT-V",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"GEC-B": {
+"nombre": "GEC-B",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"LPA-B": {
+"nombre": "LAS PALMAS BLOQUE",
+"mw_central": null,
+"unidades": 5,
+"mw_unidad": null
+},
+"MEX-I": {
+"nombre": "IMPORTACIÓN MÉXICO OPORTUNIDAD",
+"mw_central": null,
+"unidades": 1,
+"mw_unidad": null
+},
+"TAM-G": {
+"nombre": "TAM-G",
+"mw_central": null,
+"unidades": 2,
+"mw_unidad": null
+}
+}
