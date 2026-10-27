@@ -186,7 +186,7 @@ def build_rep(old, new, old_file, new_file):
 
     # Dumbbell por tecnología
     techs = sorted([t for t in MIX_ORDER if mo.get(t, 0) > 0.5 or mn.get(t, 0) > 0.5], key=lambda t: -max(mo.get(t, 0), mn.get(t, 0)))
-    W, X0, X1, RH = 470, 190, 400, 34
+    W, X0, X1, RH = 470, 190, 400, 46
     vmax = max(max(mo.get(t, 0), mn.get(t, 0)) for t in techs) * 1.05
     sx = lambda v: X0 + (X1 - X0) * v / vmax
     g = []
@@ -201,6 +201,7 @@ def build_rep(old, new, old_file, new_file):
         col = BLUE if d > 0.5 else (G2 if d < -0.5 else G3)
         txt = f"{'+' if d>=0 else '−'}{n0(abs(d))}" if abs(d) > 0.5 else '= 0'
         g.append(f'<text x="{W}" y="{y+5}" text-anchor="end" font-size="14" font-weight="600" fill="{col}" font-family="IBM Plex Mono">{txt}</text>')
+        g.append(f'<text x="{W}" y="{y+22}" text-anchor="end" font-size="12" fill="{G3}" font-family="IBM Plex Mono">{n0(a)} → {n0(b)}</text>')
     hh = 34 + len(techs) * RH
     legend = (f'<circle cx="{X0+4}" cy="10" r="6" fill="{CTX}"/><text x="{X0+16}" y="15" font-size="13" fill="{G2}" font-family="IBM Plex Mono">antes</text>'
               f'<circle cx="{X0+84}" cy="10" r="7" fill="{BLUE}"/><text x="{X0+96}" y="15" font-size="13" fill="{NAVY}" font-family="IBM Plex Mono">redespacho</text>'
