@@ -26,5 +26,10 @@
   "sha256": "0d46befc1d407547404a7c4320d9e5a809ac19115a026e91d66e97bfa818df55",
   "local": "45_PDS20261101.xlsx",
   "descargado": "2026-10-30T14:50-06:00"
+ },
+ "https://www.amm.org.gt/pdfs2/programas_despacho/02_PROGRAMAS_DE_DESPACHO_SEMANAL/2026/02_REPROGRAMACIONES_DE_DESPACHO_SEMANAL/45_PDSREP20261102.xlsx": {
+  "sha256": "2a67f1fc2947d0546da4af0a5ba66228bb6cfb942e57afecaf54e54b90b50548",
+  "local": "45_PDSREP20261102(1).xlsx",
+  "descargado": "2026-11-01T10:10-06:00"
  }
 }
