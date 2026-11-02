@@ -33,6 +33,7 @@ UMBRAL = dict(
     min_troncal_grave=60,      # min fuera de una línea 230/400 kV disparada -> grave
     ind_grave=100,     # MW de la unidad en indisponibilidad forzada nueva -> grave
     ind_saber=50,
+    hz_grave=59.5,     # frecuencia mínima (Hz) por debajo de la cual el evento es grave
 )
 
 _I = re.I
@@ -118,6 +119,30 @@ def familia_evento(e):
     return "Otros"
 
 
+_MX_DISP = re.compile(r"interconexi[oó]n\s+(?:400\s*kV\s+)?Guatemala\s*[–-]\s*M[ée]xico[^.]{0,80}?dispar|"
+                      r"(?:disparo|apertura)\s+de\s+la\s+interconexi[oó]n\s+(?:400\s*kV\s+)?Guatemala\s*[–-]\s*M[ée]xico", re.I)
+_MX_EVITA = re.compile(r"evitar\s+(?:el\s+)?disparo", re.I)
+_MX_DESV = re.compile(r"intercambio\s+Guatemala\s*[–-]\s*M[ée]xico\s+se\s+desvi[oó]\s+de\s+(-?[\d.,]+)\s*MW[^.]*?\sa\s+(-?[\d.,]+)\s*MW", re.I)
+
+
+def frec_min(t):
+    v = [float(x.replace(",", ".")) for x in re.findall(r"(5[5-9][.,]\d+)\s*Hz", t)]
+    return min(v) if v else None
+
+
+def desvio_mx(t):
+    m = _MX_DESV.search(t)
+    if not m: return None
+    try: return abs(float(m.group(1).replace(",", "")) - float(m.group(2).replace(",", "")))
+    except ValueError: return None
+
+
+def _dato_regional(t):
+    f, d = frec_min(t), desvio_mx(t)
+    x = [f"frecuencia mínima {f:.2f} Hz" if f else "", f"intercambio con México se desvió {d:.0f} MW" if d else ""]
+    return "; ".join(i for i in x if i)
+
+
 def clasificar_evento(e, notas_vistas=None):
     t = e["texto"]; kv = _n(e.get("kv")); tipo = e.get("tipo") or ""
     fam = familia_evento(e)
@@ -155,6 +180,12 @@ def clasificar_evento(e, notas_vistas=None):
         return 3, fam, f"Varias subestaciones sin tensión por falla ({dur} min)"
     if tipo == "Disparo / falla" and afect and kv >= 138 and dur >= UMBRAL["min_sin_tension_grave"]:
         return 3, fam, f"Carga sin servicio {dur // 60} h {dur % 60} min por falla"
+    if _MX_DISP.search(t) and not _MX_EVITA.search(t):
+        d = _dato_regional(t)
+        return 3, fam, "Disparo de la interconexión 400 kV Guatemala – México" + (f" ({d})" if d else "")
+    fmin = frec_min(t)
+    if fmin and fmin < UMBRAL["hz_grave"]:
+        return 3, fam, "Caída de frecuencia en el SNI: " + _dato_regional(t)
     if inter_disp and (fam == "Reserva Rápida" or RX["rra"].search(t)):
         return 3, fam, "Disparo de interconexión con convocatoria de Reserva Rápida"
 
