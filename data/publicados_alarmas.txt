@@ -10,3 +10,4 @@
 20261030 sin-alarmas
 20261031 publicado E0-G1
 20261101 publicado E0-G2
+20261102 publicado E0-G2
