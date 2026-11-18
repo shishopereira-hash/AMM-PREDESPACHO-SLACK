@@ -25,3 +25,4 @@
 20261114 publicado E0-G2
 20261115 sin-alarmas
 20261116 sin-alarmas
+20261117 publicado E0-G1
