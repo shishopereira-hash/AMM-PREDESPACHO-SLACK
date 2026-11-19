@@ -20,7 +20,7 @@ def poe_chart(poe, W=936, H=210):
     if not poe: return ''
     vals = [p['poe'] for p in poe]
     lo, hi = 0, max(vals) * 1.18
-    X0, X1, Y0, Y1 = 46, W - 10, 18, H - 30
+    X0, X1, Y0, Y1 = 64, W - 10, 18, H - 30
     sx = lambda i: X0 + (X1 - X0) * (i + 0.5) / len(vals)
     sy = lambda v: Y1 - (Y1 - Y0) * (v - lo) / (hi - lo)
     step = 50 if hi > 150 else 25
@@ -28,6 +28,8 @@ def poe_chart(poe, W=936, H=210):
     for t in range(0, int(hi) + 1, step):
         g.append(f'<line x1="{X0}" y1="{sy(t):.1f}" x2="{X1}" y2="{sy(t):.1f}" stroke="{GRID}"/>'
                  f'<text x="{X0-8}" y="{sy(t)+5:.1f}" text-anchor="end" font-size="13" fill="{G3}" font-family="IBM Plex Mono">{t}</text>')
+    # unidad del eje Y (pedido de Luis Pablo 2026-11-18: el eje debe llevar su dimensional)
+    g.append(f'<text transform="translate(13,{(Y0+Y1)/2:.1f}) rotate(-90)" text-anchor="middle" font-size="12" fill="{G3}" font-family="IBM Plex Mono">US$/MWh</text>')
     bw = (X1 - X0) / len(vals) * 0.72
     imax = vals.index(max(vals)); imin = vals.index(min(vals))
     for i, v in enumerate(vals):
