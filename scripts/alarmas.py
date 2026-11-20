@@ -1,5 +1,6 @@
 """Alarmas del SNI: lee el posdespacho de ayer (RSO e Indisponibilidades), clasifica cada evento
-y publica en Slack (#alarmas-sni) lo que sea EMERGENCIA o GRAVE; si no hubo, un aviso corto de "sin alarmas".
+y publica en Slack (#alarmas-sni) los eventos importantes (internamente emergencia o grave) con un solo encabezado
+"⚠️ EVENTO EN EL SNI"; si no hubo, un aviso corto de "sin eventos".
 
 - Usa el Excel que deja scripts/posdespacho.py en data/posdespacho/AAAA/PDaaaammdd.xlsx;
   si todavía no está, lo descarga de la AMM.
@@ -65,30 +66,25 @@ def _corto(t, n=280):
 
 
 def mensaje(d, eventos):
+    """Un solo encabezado "⚠️ EVENTO EN EL SNI", sin decir si es grave o emergencia (pedido de Edson)."""
     fecha = f'{DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]} de {d.year}'
-    emer = [e for e in eventos if e['nivel'] == 4]
-    grav = [e for e in eventos if e['nivel'] == 3]
-    titulo = '🔴 EMERGENCIA en el SNI' if emer else '🟠 Evento GRAVE en el SNI'
-    resumen = ' · '.join(x for x in [f'{len(emer)} emergencia(s)' if emer else '',
-                                     f'{len(grav)} grave(s)' if grav else ''] if x)
+    ev = sorted(eventos, key=lambda e: e['hora'] or '99')
+    n = len(ev)
+    titulo = '⚠️ EVENTO EN EL SNI' if n == 1 else f'⚠️ EVENTOS EN EL SNI ({n})'
     blocks = [
         {'type': 'header', 'text': {'type': 'plain_text', 'text': titulo, 'emoji': True}},
         {'type': 'context', 'elements': [{'type': 'mrkdwn',
-            'text': f'Operación del *{fecha}* · {resumen} · fuente: posdespacho AMM (RSO e Indisponibilidades)'}]},
+            'text': f'Operación del *{fecha}* · fuente: posdespacho AMM (RSO e Indisponibilidades)'}]},
+        {'type': 'divider'},
     ]
-    for nivel, grupo, icono, etiqueta in [(4, emer, '🔴', 'EMERGENCIA'), (3, grav, '🟠', 'GRAVE')]:
-        if not grupo:
-            continue
-        blocks.append({'type': 'divider'})
-        for e in grupo[:MAX_POR_NIVEL]:
-            hora = e['hora'] + (f"–{e['hora_fin']}" if e.get('hora_fin') else '') + ' h · ' if e['hora'] else ''
-            blocks.append({'type': 'section', 'text': {'type': 'mrkdwn',
-                'text': f"{icono} *{etiqueta}* · {hora}*{e['motivo']}*\n>{_corto(e['texto'])}"}})
-        if len(grupo) > MAX_POR_NIVEL:
-            blocks.append({'type': 'context', 'elements': [{'type': 'mrkdwn',
-                'text': f'… y {len(grupo) - MAX_POR_NIVEL} evento(s) {etiqueta.lower()} más en el posdespacho.'}]})
-    texto = f"{titulo} — {fecha}: " + '; '.join(f"{'EMERGENCIA' if e['nivel'] == 4 else 'GRAVE'}: {e['motivo']}"
-                                               for e in eventos[:5])
+    for e in ev[:MAX_POR_NIVEL]:
+        hora = e['hora'] + (f"–{e['hora_fin']}" if e.get('hora_fin') else '') + ' h · ' if e['hora'] else ''
+        blocks.append({'type': 'section', 'text': {'type': 'mrkdwn',
+            'text': f"⚠️ {hora}*{e['motivo']}*\n>{_corto(e['texto'])}"}})
+    if n > MAX_POR_NIVEL:
+        blocks.append({'type': 'context', 'elements': [{'type': 'mrkdwn',
+            'text': f'… y {n - MAX_POR_NIVEL} evento(s) más en el posdespacho.'}]})
+    texto = f"{titulo} — {fecha}: " + '; '.join(e['motivo'] for e in ev[:5])
     return texto, blocks
 
 
@@ -130,8 +126,8 @@ def correr(d, prueba=False, forzar=False):
     eventos = clasificar_dia(f, d)
     if not eventos:
         fecha = f'{DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]} de {d.year}'
-        texto = f'✅ Sin emergencias ni graves en el SNI el {fecha}'
-        blocks = [{'type': 'section', 'text': {'type': 'mrkdwn', 'text': f'✅ *Sin emergencias ni graves* en el SNI el *{fecha}*'}},
+        texto = f'✅ Sin eventos en el SNI el {fecha}'
+        blocks = [{'type': 'section', 'text': {'type': 'mrkdwn', 'text': f'✅ *Sin eventos* en el SNI el *{fecha}*'}},
                   {'type': 'context', 'elements': [{'type': 'mrkdwn',
                    'text': 'Revisado el posdespacho AMM (RSO e Indisponibilidades).'}]}]
         if prueba:
