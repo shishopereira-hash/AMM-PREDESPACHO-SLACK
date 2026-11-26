@@ -55,7 +55,7 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
 
 ## Control de zafra (ingenios) — uso interno
 - Cada día a la **1:00 PM** se publica en **#despacho-semanal** la hoja *Control diario · Zafra*
-  (estilo propio, oscuro verde/ámbar): energía, CVG, Pmax, factor de planta y acumulado por bloque,
+  (estilo propio, oscuro verde/ámbar): energía, CVG, Pmax, factor de planta (rojo < 50 %, ámbar 50–100 %, verde ≥ 100 %) y acumulado por bloque,
   salidas y fallas del día (hoja Indisponibilidades + RSO) y alertas.
 - Alertas: inicio/fin de zafra; bloque sin generación; baja ≥ 15 % contra el día anterior; baja ≥ 10 % del total;
   factor de planta < 50 %; salidas forzadas/disparos; cambio de CVG.

@@ -33,7 +33,7 @@ jobs:
           python-version: "3.11"
       - name: Instalar dependencias
         run: |
-          pip install openpyxl requests playwright
+          pip install openpyxl requests playwright pillow
           python -m playwright install --with-deps chromium
       - name: Armar y publicar la hoja de zafra
         env:

@@ -60,14 +60,33 @@ def publicar(pngs, texto):
 def hacer_dia(d, est, pm, info, cambios, prueba=False):
     r = Z.armar(d, est, pm, info, cambios)
     (IMG / str(d.year)).mkdir(parents=True, exist_ok=True)
-    pngs = []
-    for k, pagina in enumerate(build_zafra(r, est['temporada']), start=1):
-        hp = IMG / str(d.year) / f'ZAFRA_{d:%Y%m%d}_{k}.html'
-        hp.write_text(pagina, encoding='utf-8')
-        png = hp.with_suffix('.png')
-        alto = asyncio.run(to_png(hp, png)); hp.unlink()
-        print(f'  página {k}: 1080 x {alto}')
-        pngs.append(png)
+    def render(alto):
+        out = []
+        for k, pagina in enumerate(build_zafra(r, est['temporada'], alto), start=1):
+            hp = IMG / str(d.year) / f'ZAFRA_{d:%Y%m%d}_{k}.html'
+            hp.write_text(pagina, encoding='utf-8')
+            png = hp.with_suffix('.png')
+            h = asyncio.run(to_png(hp, png)); hp.unlink()
+            out.append((png, h))
+        return out
+    partes = render(1921)
+    alto = max(h for _, h in partes)
+    if any(h != alto for _, h in partes):          # una hoja creció (más alertas o bloques): igualar alturas
+        partes = render(alto)
+    # una sola imagen: resumen a la izquierda, control por bloque a la derecha
+    from PIL import Image
+    ims = [Image.open(p).convert('RGB') for p, _ in partes]
+    H = max(im.size[1] for im in ims)
+    final = Image.new('RGB', (sum(im.size[0] for im in ims), H), ims[0].getpixel((4, 4)))
+    x = 0
+    for im in ims:
+        final.paste(im, (x, 0)); x += im.size[0]
+    png = IMG / str(d.year) / f'ZAFRA_{d:%Y%m%d}.png'
+    final.save(png, optimize=True)
+    for p, _ in partes:
+        p.unlink()
+    print(f'  imagen: {final.size[0]//2} x {final.size[1]//2}')
+    pngs = [png]
     txt = texto_zafra(r, est['temporada'])
     print(txt)
     if prueba:

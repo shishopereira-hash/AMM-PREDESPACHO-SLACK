@@ -35,7 +35,7 @@ jobs:
           python-version: "3.11"
       - name: Instalar dependencias
         run: |
-          pip install openpyxl requests playwright
+          pip install openpyxl requests playwright pillow
           python -m playwright install --with-deps chromium
       - name: Vigilar la AMM y publicar en cuanto salga
         env:

@@ -42,15 +42,11 @@ def var_txt(v, dec=0):
 
 
 def fp_bar(fp):
+    """Factor de planta solo con el porcentaje: < 50 % rojo, 50–100 % ámbar, 100 % o más verde."""
     if fp is None:
         return '—'
-    w = max(0, min(fp, 1.2)) / 1.2 * 72
-    col = CANA if fp >= 0.75 else (AMBAR if fp >= 0.5 else ROJO)
-    return (f'<div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">'
-            f'<div style="width:72px;height:10px;background:{LINE};border-radius:4px;position:relative">'
-            f'<div style="position:absolute;left:0;top:0;height:10px;width:{w:.0f}px;background:{col};border-radius:4px"></div>'
-            f'<div style="position:absolute;left:{72/1.2:.0f}px;top:-4px;width:2px;height:18px;background:{MUT}"></div></div>'
-            f'<span style="color:{col};font-weight:600;min-width:62px">{fp*100:.0f}%</span></div>')
+    col = ROJO if fp < 0.5 else (AMBAR if fp < 1.0 else CANA)
+    return f'<span style="color:{col};font-weight:600">{fp*100:.0f}%</span>'
 
 
 def kpi(label, valor, unidad, nota, color=TXT):
@@ -72,14 +68,14 @@ def alertas_html(al):
 
 
 def tabla(filas):
-    h = ('<tr><th>BLOQUE</th><th>CVG<br>US$/MWh</th><th>ENERGÍA<br>MWh</th><th>vs<br>AYER</th><th>Pmax<br>MW</th>'
-         '<th>P. REAL<br>MÁX MW</th><th>FACTOR<br>DE PLANTA</th><th>ACUM.<br>ZAFRA MWh</th><th>DÍAS</th></tr>')
+    h = ('<tr><th>BLOQUE</th><th>CVG<br>US$/MWh</th><th>ENERGÍA<br>MWh</th><th>Pmax<br>MW</th>'
+         '<th>FACTOR<br>DE PLANTA</th><th>ACUM.<br>ZAFRA MWh</th><th>DÍAS</th></tr>')
     rows = ''
     for f in filas:
         if f['pendiente']:
             rows += (f'<tr style="opacity:.6"><td><b style="font-family:Space Grotesk;font-size:24px">{esc(f["bloque"])}</b>'
                      f'<div style="font-size:15px;color:{MUT}">{esc(f["nombre"])}</div></td>'
-                     f'<td>{f["cvg"]:.2f}</td><td colspan="7" style="white-space:normal;text-align:left;font-size:21px;color:{AMBAR}">CVG bajo, todavía sin arrancar (0 MWh)</td></tr>')
+                     f'<td>{f["cvg"]:.2f}</td><td colspan="6" style="white-space:normal;text-align:left;font-size:21px;color:{AMBAR}">CVG bajo, todavía sin arrancar (0 MWh)</td></tr>')
             continue
         cvg = '—' if f['cvg'] is None else f'{f["cvg"]:.2f}'
         if f['cvg'] is not None and f['cvg_ant'] is not None and abs(f['cvg'] - f['cvg_ant']) > 0.005:
@@ -87,16 +83,16 @@ def tabla(filas):
         nuevo = f'<span style="font-size:14px;color:{CANA};margin-left:6px">NUEVO</span>' if f['dias'] <= 1 else ''
         rows += (f'<tr><td><b style="font-family:Space Grotesk;font-size:24px">{esc(f["bloque"])}</b>{nuevo}'
                  f'<div style="font-size:15px;color:{MUT}">{esc(f["nombre"])}</div></td>'
-                 f'<td>{cvg}</td><td style="font-weight:600">{n0(f["E"])}</td><td>{var_txt(f["var"])}</td>'
-                 f'<td>{f["pmax"]:.1f}</td><td style="color:{MUT}">{f["p_real"]:.1f}</td><td>{fp_bar(f["fp"])}</td>'
+                 f'<td>{cvg}</td><td style="font-weight:600">{n0(f["E"])}</td>'
+                 f'<td>{f["pmax"]:.1f}</td><td>{fp_bar(f["fp"])}</td>'
                  f'<td>{n0(f["acum"])}</td><td style="color:{MUT}">{f["dias"]}<div style="font-size:14px">desde {f["inicio"][8:]}-{MESES[int(f["inicio"][5:7])-1]}</div></td></tr>')
     return f'<table>{h}{rows}</table>'
 
 
-def grafica(serie, W=470, H=300):
+def grafica(serie, W=470, H=330):
     if not serie:
         return ''
-    X0, X1, Y0, Y1 = 56, W - 6, 16, H - 34
+    X0, X1, Y0, Y1 = 78, W - 6, 16, H - 62
     mx = max(max(s['plena'] for s in serie), 1) * 1.08
     n = len(serie); bw = (X1 - X0) / n
     sy = lambda v: Y1 - (Y1 - Y0) * v / mx
@@ -113,8 +109,12 @@ def grafica(serie, W=470, H=300):
         pts.append(f'{X0 + bw * i + bw / 2:.1f},{sy(s["plena"]):.1f}')
         paso = max(1, n // 6)
         if (i % paso == 0 and n - 1 - i >= max(2, paso // 2)) or i == n - 1:
-            g.append(f'<text x="{X0 + bw*i + bw/2:.1f}" y="{H-8}" text-anchor="middle" font-size="16" fill="{MUT}" font-family="IBM Plex Mono">{s["d"].day}</text>')
+            g.append(f'<text x="{X0 + bw*i + bw/2:.1f}" y="{Y1+24}" text-anchor="middle" font-size="16" fill="{MUT}" font-family="IBM Plex Mono">{s["d"].day}</text>')
     g.append(f'<polyline points="{" ".join(pts)}" fill="none" stroke="{AMBAR}" stroke-width="2.5" stroke-dasharray="6 4"/>')
+    meses = sorted({(x['d'].year, x['d'].month) for x in serie})
+    mes_txt = ' – '.join(['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][m-1] for _, m in meses)
+    g.append(f'<text transform="translate(13,{(Y0+Y1)/2:.1f}) rotate(-90)" text-anchor="middle" font-size="15" fill="{MUT}" font-family="IBM Plex Mono">MWh por día</text>')
+    g.append(f'<text x="{(X0+X1)/2:.1f}" y="{H-4}" text-anchor="middle" font-size="15" fill="{MUT}" font-family="IBM Plex Mono">día de {mes_txt}</text>')
     return f'<svg width="{W}" height="{H}" viewBox="0 0 {W} {H}">{"".join(g)}</svg>'
 
 
@@ -149,13 +149,13 @@ def _cabeza(label, titulo, sub):
 
 def _pagina(contenido, pie):
     return HEAD + f"""
-<div id="page" style="width:1080px;box-sizing:border-box;background:{BG};color:{TXT};font-family:'Space Grotesk',sans-serif;padding:40px 36px 30px;display:flex;flex-direction:column;gap:22px">
+<div id="page" style="width:1080px;box-sizing:border-box;background:{BG};color:{TXT};font-family:'Space Grotesk',sans-serif;padding:40px 36px 30px;display:flex;flex-direction:column;gap:22px;min-height:1921px;justify-content:space-between">
 {contenido}
  <div style="font-size:15px;color:{DIM};line-height:1.35" class="m">{pie}</div>
 </div></body></html>"""
 
 
-def build_zafra(r, temporada):
+def build_zafra(r, temporada, alto=1921):
     """Devuelve 2 páginas (HTML): resumen y control por bloque. Formato ancho, legible en el celular."""
     d, t = r['d'], r['tot']
     fp_dia = t['E'] / t['plena_dia'] if t['plena_dia'] else 0
@@ -171,7 +171,7 @@ def build_zafra(r, temporada):
          + kpi('ACUMULADO ZAFRA', f'{t["acum"]/1000:,.2f}', 'GWh', f'{fp_acum*100:.1f} % plena carga<br>{t["dias"]} días')
          + kpi('BLOQUES EN ZAFRA', str(t['n_zafra']), '', f'pendiente:<br>{esc(pend)}' if pend else 'ninguno pendiente'))
     hay_rojo = any(a[0] in ('alta', 'baja') for a in r['alertas'])
-    p1 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)} · 1/2', f'Ingenios Cogeneradores<br>{fecha}',
+    p1 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)}', f'Ingenios Cogeneradores<br>{fecha}',
                          f"Día {r['dia_n']} de zafra · inició el {ini.day} de {MESES[ini.month-1]}") + f"""
  <div style="display:flex;gap:12px">{k}</div>
  <div class="card" style="padding:20px 24px;border-color:{'#6b2f27' if hay_rojo else LINE}">
@@ -181,11 +181,30 @@ def build_zafra(r, temporada):
   <div class="card" style="flex:1;padding:20px 22px"><div class="sec">ENERGÍA DIARIA EN ZAFRA</div>{grafica(r['serie'])}
    <div class="m" style="font-size:15px;color:{MUT};display:flex;gap:14px;flex-wrap:wrap"><span><span style="color:{CANA}">■</span> energía MWh</span><span><span style="color:{ROJO}">■</span> baja ≥ 10 %</span><span><span style="color:{AMBAR}">- -</span> plena carga</span></div></div>
  </div>""", 'FUENTE · AMM: posdespacho diario (carga horaria, indisponibilidades, RSO) y programa semanal vigente (CVG)')
-    p2 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)} · 2/2', 'Control por bloque',
+    p2 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)}', 'Control por bloque',
                          f"{fecha} · día {r['dia_n']} de zafra") + f"""
  <div class="card" style="padding:18px 20px">{tabla(r['filas'])}</div>""",
-                 'Factor de planta = energía ÷ (Pmax × 24 h); la raya marca 100 %. Rojo: baja ≥ 15 % vs ayer o FP &lt; 50 %. '
-                 'Pmax del predespacho diario; P. real máx = máximo de la carga horaria. Días y fecha de inicio de zafra de cada bloque.')
+                 '')
+    import re as _re
+    f = 1.32
+    head, sep, rest = p1.partition('<div id="page"')
+    rest = _re.sub(r'font-size:(\d+)px', lambda m: f'font-size:{round(int(m.group(1))*f)}px', rest)
+    rest = _re.sub(r'font-size="(\d+)"', lambda m: f'font-size="{round(int(m.group(1))*f)}"', rest)
+    rest = rest.replace('<div style="display:flex;gap:12px"><div class="card" style="flex:1;padding:20px 20px', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="card" style="flex:1;padding:20px 20px', 1)
+    rest = rest.replace('grid-template-columns:1fr 1fr;gap:12px 28px', 'grid-template-columns:1fr;gap:10px')
+    p1 = head + sep + rest
+    h2, sep2, r2 = p2.partition('<table>')
+    r2 = r2.replace('font-size:24px">', 'font-size:32px">').replace('font-size:15px;color', 'font-size:20px;color').replace('font-size:14px', 'font-size:16px')
+    p2 = h2.replace("td{{", "td{{") + sep2 + r2
+    p2 = p2.replace('td{white-space:nowrap;font-family:\'IBM Plex Mono\',monospace;font-size:22px;text-align:right;vertical-align:middle;padding:12px 6px;',
+                    'td{white-space:nowrap;font-family:\'IBM Plex Mono\',monospace;font-size:31px;text-align:right;vertical-align:middle;padding:14px 12px;')
+    p2 = p2.replace("th{font-family:'IBM Plex Mono',monospace;font-size:15px;", "th{font-family:'IBM Plex Mono',monospace;font-size:20px;")
+    p2 = p2.replace('<div class="card" style="padding:18px 20px"><table>', '<div class="card" style="padding:14px 12px"><table>')
+    p2 = p2.replace('<div style="font-size:16px">desde', '<div style="font-size:19px">desde')
+    p2 = p2.replace('GENERADORA SANTA LUCÍA</div>', 'G. SANTA LUCÍA</div>')
+    # las dos hojas se publican juntas, lado a lado, con la misma altura
+    p1 = p1.replace('min-height:1921px', f'min-height:{alto}px')
+    p2 = p2.replace('min-height:1921px', f'min-height:{alto}px')
     return [p1, p2]
 
 
