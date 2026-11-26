@@ -1,0 +1,90 @@
+{
+ "CON-B": {
+  "nombre": "CONCEPCIÓN",
+  "ingenio": "Concepción"
+ },
+ "EPI-B": {
+  "nombre": "EL PILAR",
+  "ingenio": "El Pilar"
+ },
+ "GSL-C": {
+  "nombre": "GENERADORA SANTA LUCÍA",
+  "ingenio": "Santa Lucía"
+ },
+ "LUN-B": {
+  "nombre": "LA UNIÓN",
+  "ingenio": "La Unión"
+ },
+ "MAG-B1": {
+  "nombre": "MAGDALENA B1",
+  "ingenio": "Magdalena"
+ },
+ "MAG-B3": {
+  "nombre": "MAGDALENA B3",
+  "ingenio": "Magdalena"
+ },
+ "MAG-B4": {
+  "nombre": "MAGDALENA B4",
+  "ingenio": "Magdalena"
+ },
+ "MAG-B5": {
+  "nombre": "MAGDALENA B5",
+  "ingenio": "Magdalena"
+ },
+ "MAG-B6": {
+  "nombre": "MAGDALENA B6",
+  "ingenio": "Magdalena"
+ },
+ "MAG-B7": {
+  "nombre": "MAGDALENA B7",
+  "ingenio": "Magdalena"
+ },
+ "MTI-B": {
+  "nombre": "MADRE TIERRA",
+  "ingenio": "Madre Tierra"
+ },
+ "PGO-B2": {
+  "nombre": "PALO GORDO B2",
+  "ingenio": "Palo Gordo"
+ },
+ "PGO-B": {
+  "nombre": "PALO GORDO",
+  "ingenio": "Palo Gordo"
+ },
+ "PNT-B1": {
+  "nombre": "PANTALEÓN B1",
+  "ingenio": "Pantaleón"
+ },
+ "PNT-B3": {
+  "nombre": "PANTALEÓN B3",
+  "ingenio": "Pantaleón"
+ },
+ "SAA-B": {
+  "nombre": "SANTA ANA",
+  "ingenio": "Santa Ana"
+ },
+ "SAA-B2": {
+  "nombre": "SANTA ANA B2",
+  "ingenio": "Santa Ana"
+ },
+ "TND-B3": {
+  "nombre": "TRINIDAD B3",
+  "ingenio": "Trinidad"
+ },
+ "TND-B4": {
+  "nombre": "TRINIDAD B4",
+  "ingenio": "Trinidad"
+ },
+ "TND-B5": {
+  "nombre": "TRINIDAD B5",
+  "ingenio": "Trinidad"
+ },
+ "TUL-B1": {
+  "nombre": "TULULÁ B1",
+  "ingenio": "Tululá"
+ },
+ "TUL-B4": {
+  "nombre": "TULULÁ B4",
+  "ingenio": "Tululá"
+ }
+}

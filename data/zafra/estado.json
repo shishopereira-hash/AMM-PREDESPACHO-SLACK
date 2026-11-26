@@ -1,0 +1,66 @@
+{
+ "nota": "Arranca con la Hoja4 del Directorio al 25-nov-2026. inicio/fin = fechas de zafra 2026/27; 'fijo' = no cambia (Retiro del Mercado / Indisponible). Se puede corregir a mano.",
+ "temporada": "2026/27",
+ "temporada_desde": "2026-09-01",
+ "procesado_hasta": "2026-11-25",
+ "bloques": {
+  "CON-B": {
+   "fijo": "Retiro del Mercado"
+  },
+  "EPI-B": {
+   "fijo": "Indisponible"
+  },
+  "GSL-C": {
+   "inicio": "2026-11-10"
+  },
+  "LUN-B": {
+   "inicio": "2026-11-10"
+  },
+  "MAG-B1": {},
+  "MAG-B3": {
+   "inicio": "2026-11-06"
+  },
+  "MAG-B4": {
+   "inicio": "2026-11-06"
+  },
+  "MAG-B5": {},
+  "MAG-B6": {
+   "inicio": "2026-11-12"
+  },
+  "MAG-B7": {
+   "pendiente": true
+  },
+  "MTI-B": {
+   "inicio": "2026-11-10"
+  },
+  "PGO-B2": {},
+  "PNT-B1": {
+   "inicio": "2026-11-20"
+  },
+  "PNT-B3": {
+   "inicio": "2026-11-22"
+  },
+  "SAA-B": {
+   "inicio": "2026-11-13"
+  },
+  "SAA-B2": {
+   "inicio": "2026-11-15"
+  },
+  "TND-B3": {
+   "inicio": "2026-11-06"
+  },
+  "TND-B4": {
+   "inicio": "2026-11-07"
+  },
+  "TND-B5": {},
+  "TUL-B1": {
+   "inicio": "2026-11-16"
+  },
+  "TUL-B4": {
+   "inicio": "2026-11-16"
+  },
+  "PGO-B": {
+   "inicio": "2026-11-13"
+  }
+ }
+}

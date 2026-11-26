@@ -1,0 +1,58 @@
+name: Control de zafra en Slack
+
+# Hoja diaria de los ingenios (uso interno) en #despacho-semanal.
+# Normalmente sale junto con el posdespacho (workflow "Publicar posdespacho diario en Slack").
+# Este workflow es el respaldo: 2:10 PM y cada hora de 3 a 5 PM, y el botón "Run workflow"
+# (también lo puede disparar cron-job.org con la API de GitHub).
+on:
+  schedule:
+    - cron: "10 20 * * *"       # 2:10 PM Guatemala
+    - cron: "45 21-23 * * *"    # respaldos 3:45, 4:45, 5:45 PM
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fecha AAAAMMDD para volver a publicar ese día (opcional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: posdespacho
+  cancel-in-progress: false
+
+jobs:
+  zafra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias
+        run: |
+          pip install openpyxl requests playwright
+          python -m playwright install --with-deps chromium
+      - name: Armar y publicar la hoja de zafra
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          SLACK_ZAFRA_CHANNEL: ${{ secrets.SLACK_ZAFRA_CHANNEL }}
+          FECHA: ${{ github.event.inputs.fecha }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$FECHA" ]; then
+            python scripts/zafra.py --fecha "$FECHA"
+          else
+            python scripts/zafra.py --ayer-listo && { echo "La zafra de ayer ya se publicó"; exit 0; }
+            python scripts/posdespacho.py --revisar
+            python scripts/zafra.py || { [ $? -eq 3 ] && echo "Todavía no hay posdespacho nuevo" && exit 0; exit 1; }
+          fi
+          git add data/ imagenes/
+          git diff --cached --quiet && exit 0
+          git commit -m "Control de zafra publicado en Slack"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q && exit 0; sleep 5; done
+          exit 1

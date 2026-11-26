@@ -41,6 +41,7 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          SLACK_ZAFRA_CHANNEL: ${{ secrets.SLACK_ZAFRA_CHANNEL }}
           FORZAR: ${{ github.event.inputs.forzar }}
         run: |
           git config user.name "github-actions[bot]"
@@ -60,6 +61,9 @@ jobs:
             python scripts/posdespacho.py --revisar
             if python scripts/posdespacho.py --hay-pendientes; then
               python scripts/posdespacho.py --solo-publicar
+              guardar
+              # hoja de control de zafra (ingenios) con el mismo posdespacho
+              python scripts/zafra.py || echo "Zafra: no se publicó (se reintenta en el workflow de zafra)"
               guardar
               break
             fi

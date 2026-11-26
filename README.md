@@ -52,3 +52,20 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
 - Criterios: hidroeléctricas sin Chixoy (Chixoy aparte); 3 desviaciones positivas y 3 negativas por tecnología;
   la importación de oportunidad de México = importación total desde México − Energía del Caribe;
   el intercambio MER no se compara; plantas en cascada/bloques/unidades se suman (Renace I–IV, INDE, Xacbal + Delta, Jaguar, Pantaleón...).
+
+## Control de zafra (ingenios) — uso interno
+- Cada día, en cuanto sale el posdespacho, se publica en **#despacho-semanal** la hoja *Control diario · Zafra*
+  (estilo propio, oscuro verde/ámbar): energía, CVG, Pmax, factor de planta y acumulado por bloque,
+  salidas y fallas del día (hoja Indisponibilidades + RSO) y alertas.
+- Alertas: inicio/fin de zafra; bloque sin generación; baja ≥ 15 % contra el día anterior; baja ≥ 10 % del total;
+  factor de planta < 50 %; salidas forzadas/disparos; cambio de CVG.
+- Factor de planta = energía ÷ (Pmax × 24 h). Pmax: `data/zafra/pmax.json` (del predespacho diario; valor vigente = el último con fecha ≤ día).
+- Estado de zafra: `data/zafra/estado.json` (arrancó con la Hoja4 del Directorio al 25-nov-2026). El bot marca el
+  **inicio** el primer día con CVG < 30 y generación > 0, y el **fin** cuando el CVG sube (ayer < 30, hoy ≥ 40 y > 3×).
+  Se puede corregir a mano (fechas `inicio` / `fin`). MAG-B4 tiene CVG bajo todo el año: su fin se pone a mano.
+- Script: `scripts/zafra.py` (lógica en `programa/zafra_datos.py`, imagen en `programa/render_zafra.py`). Registro: `data/publicados_zafra.txt`.
+- Workflow de respaldo: *Control de zafra en Slack* (2:10 PM y 3:45–5:45 PM; *Run workflow* con fecha `AAAAMMDD` para re-publicar).
+  Para dispararlo desde cron-job.org: `POST https://api.github.com/repos/shishopereira-hash/AMM-PREDESPACHO-SLACK/actions/workflows/zafra.yml/dispatches`
+  con el encabezado `Authorization: Bearer <token>` y el cuerpo `{"ref":"main"}`.
+- Canal: el mismo de los predespachos (`SLACK_CHANNEL_ID`). Si algún día se quiere otro canal, crear el secreto `SLACK_ZAFRA_CHANNEL`.
+- Prueba local: `python scripts/zafra.py --fecha 20261125 --prueba`.
