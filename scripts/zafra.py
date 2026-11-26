@@ -34,26 +34,45 @@ def anotar(tag):
             fh.write(tag + '\n')
 
 
-def publicar(png, texto):
+def publicar(pngs, texto):
+    """Sube varias imágenes en un solo mensaje de Slack."""
+    import json, requests
+    token = os.environ.get('SLACK_BOT_TOKEN')
     canal = os.environ.get('SLACK_ZAFRA_CHANNEL') or os.environ.get('SLACK_CHANNEL_ID')
-    if canal:
-        os.environ['SLACK_CHANNEL_ID'] = canal
-    from publicar import slack_upload
-    return slack_upload(png, texto)
+    if not token or not canal:
+        print('  (sin SLACK_BOT_TOKEN / canal: no se publica)'); return False
+    h = {'Authorization': f'Bearer {token}'}
+    files = []
+    for png in pngs:
+        data = png.read_bytes()
+        r = requests.post('https://slack.com/api/files.getUploadURLExternal', headers=h,
+                          data={'filename': png.name, 'length': len(data)}, timeout=60).json()
+        if not r.get('ok'): raise RuntimeError(f'Slack getUploadURLExternal: {r}')
+        requests.post(r['upload_url'], files={'file': (png.name, data, 'image/png')}, timeout=120).raise_for_status()
+        files.append({'id': r['file_id'], 'title': png.stem})
+    c = requests.post('https://slack.com/api/files.completeUploadExternal',
+                      headers={**h, 'Content-Type': 'application/json; charset=utf-8'},
+                      data=json.dumps({'files': files, 'channel_id': canal, 'initial_comment': texto}), timeout=60).json()
+    if not c.get('ok'): raise RuntimeError(f'Slack completeUploadExternal: {c}')
+    return True
 
 
 def hacer_dia(d, est, pm, info, cambios, prueba=False):
     r = Z.armar(d, est, pm, info, cambios)
     (IMG / str(d.year)).mkdir(parents=True, exist_ok=True)
-    hp = IMG / str(d.year) / f'ZAFRA_{d:%Y%m%d}.html'
-    hp.write_text(build_zafra(r, est['temporada']), encoding='utf-8')
-    png = hp.with_suffix('.png')
-    asyncio.run(to_png(hp, png)); hp.unlink()
+    pngs = []
+    for k, pagina in enumerate(build_zafra(r, est['temporada']), start=1):
+        hp = IMG / str(d.year) / f'ZAFRA_{d:%Y%m%d}_{k}.html'
+        hp.write_text(pagina, encoding='utf-8')
+        png = hp.with_suffix('.png')
+        alto = asyncio.run(to_png(hp, png)); hp.unlink()
+        print(f'  página {k}: 1080 x {alto}')
+        pngs.append(png)
     txt = texto_zafra(r, est['temporada'])
     print(txt)
     if prueba:
-        print('  imagen de prueba:', png); return True
-    return publicar(png, txt)
+        print('  imágenes de prueba:', *pngs); return True
+    return publicar(pngs, txt)
 
 
 def main():
