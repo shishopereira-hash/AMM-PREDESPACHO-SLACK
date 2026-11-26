@@ -62,9 +62,7 @@ jobs:
             if python scripts/posdespacho.py --hay-pendientes; then
               python scripts/posdespacho.py --solo-publicar
               guardar
-              # hoja de control de zafra (ingenios) con el mismo posdespacho
-              python scripts/zafra.py || echo "Zafra: no se publicó (se reintenta en el workflow de zafra)"
-              guardar
+              # la hoja de zafra sale aparte a la 1:00 PM (workflow "Control de zafra en Slack")
               break
             fi
             [ "$(date -u +%H)" -ge 21 ] && break

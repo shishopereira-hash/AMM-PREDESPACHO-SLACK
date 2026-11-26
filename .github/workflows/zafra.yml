@@ -1,13 +1,13 @@
 name: Control de zafra en Slack
 
 # Hoja diaria de los ingenios (uso interno) en #despacho-semanal.
-# Normalmente sale junto con el posdespacho (workflow "Publicar posdespacho diario en Slack").
-# Este workflow es el respaldo: 2:10 PM y cada hora de 3 a 5 PM, y el botón "Run workflow"
+# Sale todos los días a la 1:00 PM (cron-job.org dispara este workflow por la API de GitHub);
+# los horarios de abajo son respaldo (1:00 PM y 1:45–5:45 PM), y el botón "Run workflow"
 # (también lo puede disparar cron-job.org con la API de GitHub).
 on:
   schedule:
-    - cron: "10 20 * * *"       # 2:10 PM Guatemala
-    - cron: "45 21-23 * * *"    # respaldos 3:45, 4:45, 5:45 PM
+    - cron: "0 19 * * *"        # 1:00 PM Guatemala (el arranque confiable lo da cron-job.org)
+    - cron: "45 19-23 * * *"    # respaldos 1:45 a 5:45 PM
   workflow_dispatch:
     inputs:
       fecha:
