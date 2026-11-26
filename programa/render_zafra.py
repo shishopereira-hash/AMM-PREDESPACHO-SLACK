@@ -143,7 +143,6 @@ def _cabeza(label, titulo, sub):
    <div style="font-size:48px;font-weight:700;letter-spacing:-.02em;line-height:1.08">{titulo}</div>
    <div style="font-size:22px;color:{MUT}">{sub}</div>
   </div>
-  <div class="m" style="font-size:15px;color:{CANA};border:2px solid {CANA2};border-radius:22px;padding:6px 14px;letter-spacing:.1em;white-space:nowrap;margin-top:2px">USO INTERNO</div>
  </div>
  <div style="height:5px;background:linear-gradient(90deg,{CANA} 0 70%,{AMBAR} 70% 100%);border-radius:3px"></div>"""
 
@@ -172,7 +171,7 @@ def build_zafra(r, temporada):
          + kpi('ACUMULADO ZAFRA', f'{t["acum"]/1000:,.2f}', 'GWh', f'{fp_acum*100:.1f} % plena carga<br>{t["dias"]} días')
          + kpi('BLOQUES EN ZAFRA', str(t['n_zafra']), '', f'pendiente:<br>{esc(pend)}' if pend else 'ninguno pendiente'))
     hay_rojo = any(a[0] in ('alta', 'baja') for a in r['alertas'])
-    p1 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)} · 1/2', f'Ingenios<br>{fecha}',
+    p1 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)} · 1/2', f'Ingenios Cogeneradores<br>{fecha}',
                          f"Día {r['dia_n']} de zafra · inició el {ini.day} de {MESES[ini.month-1]}") + f"""
  <div style="display:flex;gap:12px">{k}</div>
  <div class="card" style="padding:20px 24px;border-color:{'#6b2f27' if hay_rojo else LINE}">
