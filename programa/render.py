@@ -52,9 +52,9 @@ table{{{{border-collapse:collapse}}}}
 
 def frame(label, title, subtitle, body, source, height):
     return HEAD.format(title=esc(title)) + f"""
-<div id="page" style="width:1080px;min-height:1080px;box-sizing:border-box;background:#fff;color:{NAVY};font-family:'Space Grotesk',sans-serif;display:flex;flex-direction:column">
+<div id="page" style="width:1080px;min-height:{max(height or 1080, 1080)}px;box-sizing:border-box;background:#fff;color:{NAVY};font-family:'Space Grotesk',sans-serif;display:flex;flex-direction:column">
 <div style="display:flex;height:10px"><div style="flex:3;background:{BLUE}"></div><div style="flex:1;background:{GOLD}"></div></div>
-<div style="flex:1;padding:44px 64px 36px;display:flex;flex-direction:column;gap:28px">
+<div style="flex:1;padding:44px 64px 36px;display:flex;flex-direction:column;gap:28px;justify-content:space-between">
  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:32px">
   <div style="display:flex;flex-direction:column;gap:12px">
    <div class="mono" style="font-size:20px;font-weight:500;letter-spacing:.12em;color:{BLUE}">{esc(label)}</div>
@@ -116,14 +116,14 @@ def build_pre(cur, prev, cur_file, prev_file):
     for t in order:
         v = s['mix'][t]; pv = p['mix'].get(t, 0)
         rows += f"""<tr style="border-bottom:1px solid {GRID}">
-<td style="padding:6px 0;width:18px"><div style="width:12px;height:12px;background:{TECH_COLOR[t]}"></div></td>
-<td style="padding:6px 8px;font-size:20px">{TECH_NAME[t]}</td>
+<td style="padding:10px 0;width:20px"><div style="width:14px;height:14px;background:{TECH_COLOR[t]}"></div></td>
+<td style="padding:10px 8px;font-size:21px">{TECH_NAME[t]}</td>
 <td class="mono" style="text-align:right;font-size:19px;font-weight:600">{n1(v/1000)}</td>
 <td class="mono" style="text-align:right;font-size:18px;color:{G2};padding-left:14px">{v/tot*100:.1f}%</td>
 <td class="mono" style="text-align:right;padding-left:14px;white-space:nowrap">{var_html(pct(v, pv) if pv else None, 14)}</td></tr>"""
     mix_html = f"""<div><div class="sec">MIX DE GENERACIÓN PROGRAMADO</div>
 <div style="display:flex;gap:36px;align-items:center">
-{donut([(t, s['mix'][t]) for t in order], tot, n1(tot/1000), 'GWh generación')}
+{donut([(t, s['mix'][t]) for t in order], tot, n1(tot/1000), 'GWh generación', size=330)}
 <table style="flex:1"><tr class="mono" style="font-size:14px;color:{G3};letter-spacing:.06em">
 <td></td><td style="padding:0 8px 4px">TECNOLOGÍA</td><td style="text-align:right">GWh</td><td style="text-align:right">PART.</td><td style="text-align:right">VS SEM. {p['week']}</td></tr>{rows}</table>
 </div></div>"""
@@ -132,10 +132,10 @@ def build_pre(cur, prev, cur_file, prev_file):
     bars = ''
     for i, pl in enumerate(s['top_cost']):
         w = pl['cost'] / mx * 100
-        bars += f"""<div style="margin-bottom:12px">
+        bars += f"""<div style="margin-bottom:18px">
 <div style="display:flex;justify-content:space-between;font-size:19px;margin-bottom:4px"><span><b class="mono" style="color:{G3}">{i+1}</b>&nbsp; {esc(pl['name'])}</span>
 <span class="mono" style="font-weight:600">{money(pl['cost'])} <span style="color:{G2};font-weight:400;font-size:16px">{pl['cost']/s['total_cost']*100:.1f}%</span></span></div>
-<div style="height:10px;background:{GRID}"><div style="width:{w:.1f}%;height:10px;background:{GOLD if i == 0 else BLUE}"></div></div>
+<div style="height:14px;background:{GRID}"><div style="width:{w:.1f}%;height:14px;background:{GOLD if i == 0 else BLUE}"></div></div>
 <div class="mono" style="font-size:14px;color:{G3};margin-top:3px">{n0(pl['energy'])} MWh</div></div>"""
     cov = f"Costo = energía × CVG. Cubre {s['coverage']*100:.1f}% de la generación" + (f"; sin CVG: {', '.join(s['no_cvg'])}" if s['no_cvg'] else '')
     top_html = f"""<div style="flex:1.15"><div class="sec">TOP 5 PLANTAS POR COSTO OPERATIVO</div>{bars}
@@ -157,7 +157,7 @@ def build_pre(cur, prev, cur_file, prev_file):
 {mix_html}
 <div style="display:flex;gap:48px">{top_html}<div style="flex:1">{chx}{mant}</div></div>"""
     source = f"AMM · Programación semanal, sem. {s['week']}"
-    return frame('MERCADO MAYORISTA · PREDESPACHO SEMANAL', title, subtitle, body, source, 1500), s, p
+    return frame('MERCADO MAYORISTA · PREDESPACHO SEMANAL', title, subtitle, body, source, 1756), s, p
 
 
 # ====================== REDESPACHO ======================
@@ -192,32 +192,32 @@ def build_rep(old, new, old_file, new_file):
 
     # Dumbbell por tecnología
     techs = sorted([t for t in MIX_ORDER if mo.get(t, 0) > 0.5 or mn.get(t, 0) > 0.5], key=lambda t: -max(mo.get(t, 0), mn.get(t, 0)))
-    W, X0, X1, RH = 480, 222, 392, 46
+    W, X0, X1, RH = 540, 262, 436, 70
     vmax = max(max(mo.get(t, 0), mn.get(t, 0)) for t in techs) * 1.05
     sx = lambda v: X0 + (X1 - X0) * v / vmax
     g = []
     for i, t in enumerate(techs):
-        y = 34 + i * RH; a, b = mo.get(t, 0), mn.get(t, 0); d = b - a
-        g.append(f'<text x="0" y="{y+5}" font-size="17" fill="{NAVY}" font-family="Space Grotesk">{TECH_NAME[t]}</text>')
-        g.append(f'<line x1="{X0}" y1="{y}" x2="{X1}" y2="{y}" stroke="{GRID}"/>')
+        y = 50 + i * RH; a, b = mo.get(t, 0), mn.get(t, 0); d = b - a
+        g.append(f'<text x="0" y="{y+2}" font-size="21" fill="{NAVY}" font-family="Space Grotesk">{TECH_NAME[t]}</text>')
+        g.append(f'<text x="0" y="{y+24}" font-size="16" fill="{G3}" font-family="IBM Plex Mono">{n0(a)} → {n0(b)}</text>')
+        g.append(f'<line x1="{X0}" y1="{y}" x2="{X1}" y2="{y}" stroke="{GRID}" stroke-width="2"/>')
         if abs(d) > 0.5:
-            g.append(f'<line x1="{sx(a):.1f}" y1="{y}" x2="{sx(b):.1f}" y2="{y}" stroke="#9DBEF8" stroke-width="4"/>')
-        g.append(f'<circle cx="{sx(a):.1f}" cy="{y}" r="6" fill="{CTX}"/>')
-        g.append(f'<circle cx="{sx(b):.1f}" cy="{y}" r="7" fill="{BLUE if abs(d)>0.5 else CTX}"/>')
+            g.append(f'<line x1="{sx(a):.1f}" y1="{y}" x2="{sx(b):.1f}" y2="{y}" stroke="#9DBEF8" stroke-width="5"/>')
+        g.append(f'<circle cx="{sx(a):.1f}" cy="{y}" r="8" fill="{CTX}"/>')
+        g.append(f'<circle cx="{sx(b):.1f}" cy="{y}" r="9" fill="{BLUE if abs(d)>0.5 else CTX}"/>')
         col = BLUE if d > 0.5 else (G2 if d < -0.5 else G3)
         txt = f"{'+' if d>=0 else '−'}{n0(abs(d))}" if abs(d) > 0.5 else '= 0'
-        g.append(f'<text x="{W}" y="{y+5}" text-anchor="end" font-size="17" font-weight="600" fill="{col}" font-family="IBM Plex Mono">{txt}</text>')
-        g.append(f'<text x="{W}" y="{y+22}" text-anchor="end" font-size="14" fill="{G3}" font-family="IBM Plex Mono">{n0(a)} → {n0(b)}</text>')
-    hh = 34 + len(techs) * RH
-    legend = (f'<circle cx="{X0+4}" cy="10" r="6" fill="{CTX}"/><text x="{X0+16}" y="15" font-size="16" fill="{G2}" font-family="IBM Plex Mono">antes</text>'
-              f'<circle cx="{X0+84}" cy="10" r="7" fill="{BLUE}"/><text x="{X0+96}" y="15" font-size="16" fill="{NAVY}" font-family="IBM Plex Mono">redespacho</text>'
-              f'<text x="{W}" y="15" text-anchor="end" font-size="14" fill="{G3}" font-family="IBM Plex Mono">Δ MWh</text>')
-    dumb = f"""<div style="flex:1"><div class="sec">CAMBIO EN EL MIX · MWh</div>
+        g.append(f'<text x="{W}" y="{y+7}" text-anchor="end" font-size="21" font-weight="600" fill="{col}" font-family="IBM Plex Mono">{txt}</text>')
+    hh = 50 + len(techs) * RH - 30
+    legend = (f'<circle cx="{X0+6}" cy="12" r="8" fill="{CTX}"/><text x="{X0+20}" y="18" font-size="18" fill="{G2}" font-family="IBM Plex Mono">antes</text>'
+              f'<circle cx="{X0+96}" cy="12" r="9" fill="{BLUE}"/><text x="{X0+110}" y="18" font-size="18" fill="{NAVY}" font-family="IBM Plex Mono">redesp.</text>'
+              f'<text x="{W}" y="18" text-anchor="end" font-size="16" fill="{G3}" font-family="IBM Plex Mono">Δ MWh</text>')
+    dumb = f"""<div style="width:{W}px;flex-shrink:0"><div class="sec">CAMBIO EN EL MIX · MWh</div>
 <svg width="{W}" height="{hh}" viewBox="0 0 {W} {hh}">{legend}{''.join(g)}</svg></div>"""
 
     # Cambios por planta
     ch = [(n, po[n]['energy'], pn[n]['energy']) for n in pn if n in po and pn[n]['tech'] in MIX_ORDER]
-    ch = sorted([c for c in ch if abs(c[2]-c[1]) > 0.5], key=lambda c: -abs(c[2]-c[1]))[:8]
+    ch = sorted([c for c in ch if abs(c[2]-c[1]) > 0.5], key=lambda c: -abs(c[2]-c[1]))[:10]
     dmax = max(abs(b-a) for _, a, b in ch) if ch else 1
     prow = ''
     for n, a, b in ch:
@@ -225,11 +225,11 @@ def build_rep(old, new, old_file, new_file):
         if b < 0.5: tag = '<span style="color:' + G2 + '">se apaga</span>'
         elif a < 0.5: tag = '<span style="color:' + BLUE + '">entra</span>'
         else: tag = f'{n0(a)} → {n0(b)}'
-        prow += f"""<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:18px">
+        prow += f"""<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:20px">
 <span>{esc(n)}</span><span class="mono" style="font-weight:600;color:{BLUE if d>0 else G2}">{'+' if d>0 else '−'}{n0(abs(d))}</span></div>
-<div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:{GRID}"><div style="width:{w:.1f}%;height:8px;background:{BLUE if d>0 else CTX}"></div></div>
-<span class="mono" style="font-size:14px;color:{G3};white-space:nowrap">{tag}</span></div></div>"""
-    plants = f"""<div style="flex:1"><div class="sec">PRINCIPALES CAMBIOS POR PLANTA · MWh</div>{prow}</div>"""
+<div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:12px;background:{GRID}"><div style="width:{w:.1f}%;height:12px;background:{BLUE if d>0 else CTX}"></div></div>
+<span class="mono" style="font-size:16px;color:{G3};white-space:nowrap">{tag}</span></div></div>"""
+    plants = f"""<div style="flex:1;min-width:0"><div class="sec">CAMBIOS POR PLANTA · MWh</div>{prow}</div>"""
 
     cxo, cxn = po['CHIXOY'], pn['CHIXOY']
     chx = f"""<div><div class="sec">CHIXOY · DÍAS AFECTADOS</div>
@@ -239,10 +239,10 @@ def build_rep(old, new, old_file, new_file):
  <div><div style="font-size:16px;color:{G2}">COSTO</div><div style="font-size:26px;font-weight:600;white-space:nowrap">{money(cxo['cost'])} → <span style="color:{BLUE}">{money(cxn['cost'])}</span></div>{var_html(pct(cxn['cost'], cxo['cost']),14)}</div>
 </div></div>"""
 
-    body = f"""{nota}{cost}<div style="display:flex;gap:56px">{dumb}{plants}</div>{chx}"""
+    body = f"""{nota}{cost}<div style="display:flex;gap:40px">{dumb}{plants}</div>{chx}"""
     source = f"AMM · Ajuste a la programación semanal ({new['rev']})"
     res = {'co': co, 'cn': cn, 'mo': mo, 'mn': mn, 'wvo': wvo, 'wvn': wvn, 'changes': ch, 'notes': notes}
-    return frame('MERCADO MAYORISTA · REDESPACHO SEMANAL', title, subtitle, body, source, 1500), res
+    return frame('MERCADO MAYORISTA · REDESPACHO SEMANAL', title, subtitle, body, source, 1756), res
 
 
 async def to_png(html_path, png_path, height=1500):

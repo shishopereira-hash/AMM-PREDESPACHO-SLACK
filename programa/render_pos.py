@@ -114,7 +114,7 @@ def build_pos(c):
     body = f"""<div style="display:flex;gap:24px">{kp}</div>{poe}
 <div style="display:flex;gap:48px">{tech}{chx}</div>{plants}"""
     return frame('MERCADO MAYORISTA · POSDESPACHO DIARIO', title, subtitle, body,
-                 f"AMM · PosDespacho {d:%d/%m/%Y} · sem. {c['week']}", 1500)
+                 f"AMM · PosDespacho {d:%d/%m/%Y} · sem. {c['week']}", 1756)
 
 
 def texto_pos(c):
