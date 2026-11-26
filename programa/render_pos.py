@@ -7,6 +7,11 @@ from parse_pds import pct
 # (1080 x ~2200, llena la pantalla del teléfono). Solo aplica a la imagen del posdespacho.
 G2, G3, CTX = '#2E3848', '#465166', '#7C8699'
 TRACK = '#DFE3EA'
+# globo de chat verde del canal (como en las demás imágenes del canal)
+BURBUJA = ('<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#25D366"/>'
+           '<path d="M10 13.5a3.5 3.5 0 0 1 3.5-3.5h13a3.5 3.5 0 0 1 3.5 3.5v9a3.5 3.5 0 0 1-3.5 3.5H18l-5 4v-4h0.5'
+           'a3.5 3.5 0 0 1-3.5-3.5z" fill="#fff"/><circle cx="15.2" cy="18" r="1.7" fill="#25D366"/>'
+           '<circle cx="20" cy="18" r="1.7" fill="#25D366"/><circle cx="24.8" cy="18" r="1.7" fill="#25D366"/></svg>')
 
 
 def var_html(p, size=22):
@@ -45,7 +50,7 @@ def frame(label, title, subtitle, body, source):
  <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:20px;border-top:2px solid {DIV};padding-top:18px" class="mono">
   <div style="font-size:18px;color:{G2}">FUENTE · {esc(source)}</div>
   <div style="display:flex;align-items:center;gap:10px;white-space:nowrap;font-family:'Space Grotesk';font-size:21px;font-weight:600;color:{NAVY}">
-   <img src="{ASSETS.as_uri()}/logo_er.png" style="width:36px;height:36px">{CANAL}</div>
+   {BURBUJA}{CANAL}<img src="{ASSETS.as_uri()}/emoji_robot.png" style="height:30px;margin-left:2px"><img src="{ASSETS.as_uri()}/emoji_gt.png" style="height:26px"></div>
  </div>
 </div></div></body></html>"""
 
