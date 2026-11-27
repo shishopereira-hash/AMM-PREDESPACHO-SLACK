@@ -2,7 +2,7 @@
  "nota": "Arranca con la Hoja4 del Directorio al 25-nov-2026. inicio/fin = fechas de zafra 2026/27; 'fijo' = no cambia (Retiro del Mercado / Indisponible). Se puede corregir a mano.",
  "temporada": "2026/27",
  "temporada_desde": "2026-09-01",
- "procesado_hasta": "2026-11-25",
+ "procesado_hasta": "2026-11-26",
  "bloques": {
   "CON-B": {
    "fijo": "Retiro del Mercado"
