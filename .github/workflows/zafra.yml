@@ -14,10 +14,6 @@ on:
         description: "Fecha AAAAMMDD para volver a publicar ese día (opcional)"
         required: false
         default: ""
-      canal:
-        description: "(ya no se usa: la hoja de zafra solo va a #ingenios-cogeneradores)"
-        required: false
-        default: ""
 
 permissions:
   contents: write
@@ -46,12 +42,11 @@ jobs:
           SLACK_ZAFRA_CHANNEL: ${{ secrets.SLACK_ZAFRA_CHANNEL }}
           SLACK_ZAFRA_CHANNEL_2: ${{ secrets.SLACK_ZAFRA_CHANNEL_2 }}
           FECHA: ${{ github.event.inputs.fecha }}
-          CANAL: ${{ github.event.inputs.canal }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -n "$FECHA" ]; then
-            if [ -n "$CANAL" ]; then python scripts/zafra.py --fecha "$FECHA" --canal "$CANAL"; else python scripts/zafra.py --fecha "$FECHA"; fi
+            python scripts/zafra.py --fecha "$FECHA"
           else
             python scripts/zafra.py --ayer-listo && { echo "La zafra de ayer ya se publicó"; exit 0; }
             python scripts/posdespacho.py --revisar
