@@ -40,6 +40,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
           SLACK_ZAFRA_CHANNEL: ${{ secrets.SLACK_ZAFRA_CHANNEL }}
+          SLACK_ZAFRA_CHANNEL_2: ${{ secrets.SLACK_ZAFRA_CHANNEL_2 }}
           FECHA: ${{ github.event.inputs.fecha }}
         run: |
           git config user.name "github-actions[bot]"

@@ -245,16 +245,16 @@ def build_rep(old, new, old_file, new_file):
     return frame('MERCADO MAYORISTA · REDESPACHO SEMANAL', title, subtitle, body, source, 1756), res
 
 
-async def to_png(html_path, png_path, height=1500):
+async def to_png(html_path, png_path, height=1500, width=1080):
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
         b = await p.chromium.launch()
-        pg = await b.new_page(viewport={'width': 1080, 'height': height}, device_scale_factor=2)
+        pg = await b.new_page(viewport={'width': width, 'height': height}, device_scale_factor=2)
         await pg.goto(pathlib.Path(html_path).resolve().as_uri())
         await pg.evaluate('document.fonts.ready'); await pg.wait_for_timeout(300)
         # altura real del contenido para detectar desbordes
         over = await pg.evaluate("Math.ceil(document.getElementById('page').getBoundingClientRect().height)")
-        await pg.set_viewport_size({'width': 1080, 'height': over})
-        await pg.screenshot(path=str(png_path), clip={'x': 0, 'y': 0, 'width': 1080, 'height': over})
+        await pg.set_viewport_size({'width': width, 'height': over})
+        await pg.screenshot(path=str(png_path), clip={'x': 0, 'y': 0, 'width': width, 'height': over})
         await b.close()
         return over

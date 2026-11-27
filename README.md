@@ -67,5 +67,8 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
 - Workflow: *Control de zafra en Slack* (1:00 PM por cron-job.org; respaldos de GitHub 1:45–5:45 PM; *Run workflow* con fecha `AAAAMMDD` para re-publicar).
   Para dispararlo desde cron-job.org: `POST https://api.github.com/repos/shishopereira-hash/AMM-PREDESPACHO-SLACK/actions/workflows/zafra.yml/dispatches`
   con el encabezado `Authorization: Bearer <token>` y el cuerpo `{"ref":"main"}`.
-- Canal: el mismo de los predespachos (`SLACK_CHANNEL_ID`). Si algún día se quiere otro canal, crear el secreto `SLACK_ZAFRA_CHANNEL`.
+- Canales: #despacho-semanal (`SLACK_CHANNEL_ID`, o `SLACK_ZAFRA_CHANNEL` si existe) recibe la versión compacta;
+  el canal de invitados (`SLACK_ZAFRA_CHANNEL_2`, C0CMC08J43U) recibe la versión para computadora con la tabla completa
+  (vs ayer, potencia real máxima y barras del factor de planta). Registro por canal en `data/publicados_zafra.txt` (`AAAAMMDD` y `AAAAMMDD@2`).
+  Re-publicar solo en el canal nuevo: `python scripts/zafra.py --fecha AAAAMMDD --canal 2`.
 - Prueba local: `python scripts/zafra.py --fecha 20261125 --prueba`.

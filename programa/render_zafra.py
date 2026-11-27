@@ -41,12 +41,22 @@ def var_txt(v, dec=0):
     return f'<span style="color:{col};font-weight:600">{"▲" if v > 0 else "▼"} {abs(v)*100:.{dec}f}%</span>'
 
 
-def fp_bar(fp):
-    """Factor de planta solo con el porcentaje: < 50 % rojo, 50–100 % ámbar, 100 % o más verde."""
+ANCHO_COMPLETA = 1640     # hoja de la tabla en la versión para computadora (canal nuevo)
+
+
+def fp_bar(fp, barra=False):
+    """Factor de planta: < 50 % rojo, 50–100 % ámbar, 100 % o más verde. Con barra en la versión completa."""
     if fp is None:
         return '—'
     col = ROJO if fp < 0.5 else (AMBAR if fp < 1.0 else CANA)
-    return f'<span style="color:{col};font-weight:600">{fp*100:.0f}%</span>'
+    txt = f'<span style="color:{col};font-weight:600;min-width:86px;display:inline-block">{fp*100:.0f}%</span>'
+    if not barra:
+        return txt
+    w = max(0, min(fp, 1.2)) / 1.2 * 110
+    return (f'<div style="display:flex;align-items:center;gap:12px;justify-content:flex-end">'
+            f'<div style="width:110px;height:14px;background:{LINE};border-radius:7px;position:relative">'
+            f'<div style="position:absolute;left:0;top:0;height:14px;width:{w:.0f}px;background:{col};border-radius:7px"></div>'
+            f'<div style="position:absolute;left:{110/1.2:.0f}px;top:-5px;width:2px;height:24px;background:{MUT}"></div></div>{txt}</div>')
 
 
 def kpi(label, valor, unidad, nota, color=TXT):
@@ -67,15 +77,17 @@ def alertas_html(al):
     return f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px">{items}</div>'
 
 
-def tabla(filas):
-    h = ('<tr><th>BLOQUE</th><th>CVG<br>US$/MWh</th><th>ENERGÍA<br>MWh</th><th>Pmax<br>MW</th>'
+def tabla(filas, completa=False):
+    """completa=True: versión para computadora, con 'vs ayer' y potencia real máxima."""
+    h = ('<tr><th>BLOQUE</th><th>CVG<br>US$/MWh</th><th>ENERGÍA<br>MWh</th>' + ('<th>vs<br>AYER</th>' if completa else '') +
+         '<th>Pmax<br>MW</th>' + ('<th>P. REAL<br>MÁX MW</th>' if completa else '') +
          '<th>FACTOR<br>DE PLANTA</th><th>ACUM.<br>ZAFRA MWh</th><th>DÍAS</th></tr>')
     rows = ''
     for f in filas:
         if f['pendiente']:
             rows += (f'<tr style="opacity:.6"><td><b style="font-family:Space Grotesk;font-size:24px">{esc(f["bloque"])}</b>'
                      f'<div style="font-size:15px;color:{MUT}">{esc(f["nombre"])}</div></td>'
-                     f'<td>{f["cvg"]:.2f}</td><td colspan="6" style="white-space:normal;text-align:left;font-size:21px;color:{AMBAR}">CVG bajo, todavía sin arrancar (0 MWh)</td></tr>')
+                     f'<td>{f["cvg"]:.2f}</td><td colspan="{8 if completa else 6}" style="white-space:normal;text-align:left;font-size:21px;color:{AMBAR}">CVG bajo, todavía sin arrancar (0 MWh)</td></tr>')
             continue
         cvg = '—' if f['cvg'] is None else f'{f["cvg"]:.2f}'
         if f['cvg'] is not None and f['cvg_ant'] is not None and abs(f['cvg'] - f['cvg_ant']) > 0.005:
@@ -84,7 +96,9 @@ def tabla(filas):
         rows += (f'<tr><td><b style="font-family:Space Grotesk;font-size:24px">{esc(f["bloque"])}</b>{nuevo}'
                  f'<div style="font-size:15px;color:{MUT}">{esc(f["nombre"])}</div></td>'
                  f'<td>{cvg}</td><td style="font-weight:600">{n0(f["E"])}</td>'
-                 f'<td>{f["pmax"]:.1f}</td><td>{fp_bar(f["fp"])}</td>'
+                 + (f'<td>{var_txt(f["var"])}</td>' if completa else '') +
+                 f'<td>{f["pmax"]:.1f}</td>' + (f'<td style="color:{MUT}">{f["p_real"]:.1f}</td>' if completa else '') +
+                 f'<td>{fp_bar(f["fp"], completa)}</td>'
                  f'<td>{n0(f["acum"])}</td><td style="color:{MUT}">{f["dias"]}<div style="font-size:14px">desde {f["inicio"][8:]}-{MESES[int(f["inicio"][5:7])-1]}</div></td></tr>')
     return f'<table>{h}{rows}</table>'
 
@@ -147,15 +161,15 @@ def _cabeza(label, titulo, sub):
  <div style="height:5px;background:linear-gradient(90deg,{CANA} 0 70%,{AMBAR} 70% 100%);border-radius:3px"></div>"""
 
 
-def _pagina(contenido, pie):
+def _pagina(contenido, pie, ancho=1080):
     return HEAD + f"""
-<div id="page" style="width:1080px;box-sizing:border-box;background:{BG};color:{TXT};font-family:'Space Grotesk',sans-serif;padding:40px 36px 30px;display:flex;flex-direction:column;gap:22px;min-height:1921px;justify-content:space-between">
+<div id="page" style="width:{ancho}px;box-sizing:border-box;background:{BG};color:{TXT};font-family:'Space Grotesk',sans-serif;padding:40px 36px 30px;display:flex;flex-direction:column;gap:22px;min-height:1921px;justify-content:space-between">
 {contenido}
  <div style="font-size:15px;color:{DIM};line-height:1.35" class="m">{pie}</div>
 </div></body></html>"""
 
 
-def build_zafra(r, temporada, alto=1921):
+def build_zafra(r, temporada, alto=1921, completa=False):
     """Devuelve 2 páginas (HTML): resumen y control por bloque. Formato ancho, legible en el celular."""
     d, t = r['d'], r['tot']
     fp_dia = t['E'] / t['plena_dia'] if t['plena_dia'] else 0
@@ -183,8 +197,8 @@ def build_zafra(r, temporada, alto=1921):
  </div>""", 'FUENTE · AMM: posdespacho diario (carga horaria, indisponibilidades, RSO) y programa semanal vigente (CVG)')
     p2 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)}', 'Control por bloque',
                          f"{fecha} · día {r['dia_n']} de zafra") + f"""
- <div class="card" style="padding:18px 20px">{tabla(r['filas'])}</div>""",
-                 '')
+ <div class="card" style="padding:18px 20px">{tabla(r['filas'], completa)}</div>""",
+                 '', ANCHO_COMPLETA if completa else 1080)
     import re as _re
     f = 1.32
     head, sep, rest = p1.partition('<div id="page"')
@@ -202,6 +216,9 @@ def build_zafra(r, temporada, alto=1921):
     p2 = p2.replace('<div class="card" style="padding:18px 20px"><table>', '<div class="card" style="padding:14px 12px"><table>')
     p2 = p2.replace('<div style="font-size:16px">desde', '<div style="font-size:19px">desde')
     p2 = p2.replace('GENERADORA SANTA LUCÍA</div>', 'G. SANTA LUCÍA</div>')
+    if completa:                                   # versión para computadora: textos grises más grandes
+        p2 = (p2.replace('font-size:20px;color', 'font-size:23px;color').replace('<div style="font-size:19px">desde', '<div style="font-size:22px">desde')
+                .replace("th{font-family:'IBM Plex Mono',monospace;font-size:20px;", "th{font-family:'IBM Plex Mono',monospace;font-size:22px;"))
     # las dos hojas se publican juntas, lado a lado, con la misma altura
     p1 = p1.replace('min-height:1921px', f'min-height:{alto}px')
     p2 = p2.replace('min-height:1921px', f'min-height:{alto}px')
