@@ -6,9 +6,7 @@ Uso:
   python scripts/zafra.py --prueba           solo genera la imagen (no publica ni guarda el estado)
   python scripts/zafra.py --ayer-listo       código 0 si el día de ayer ya se publicó
 
-Canales: SLACK_ZAFRA_CHANNEL si existe; si no, SLACK_CHANNEL_ID (#despacho-semanal) -> versión compacta.
-         SLACK_ZAFRA_CHANNEL_2 (canal nuevo, opcional) -> versión con la tabla completa para computadora.
-  python scripts/zafra.py --fecha 20261125 --canal 2   re-publica ese día solo en el canal nuevo
+Canal: SLACK_ZAFRA_CHANNEL_2 (#ingenios-cogeneradores), versión 'grande'. Ya no se publica en #despacho-semanal.
 Registro: data/publicados_zafra.txt   Estado de zafra: data/zafra/estado.json
 """
 import os, sys, asyncio, datetime as dt
@@ -37,16 +35,11 @@ def anotar(tag):
 
 
 def canales():
-    """[(etiqueta, canal, completa)]: #despacho-semanal con la versión compacta y, si existe, el canal nuevo
-    (SLACK_ZAFRA_CHANNEL_2) con la tabla completa para computadora."""
-    out = []
-    c1 = os.environ.get('SLACK_ZAFRA_CHANNEL') or os.environ.get('SLACK_CHANNEL_ID')
-    if c1:
-        out.append(('', c1, False))
+    """[(etiqueta, canal, version)]. Desde el 26-nov-2026 la hoja de zafra va SOLO a #ingenios-cogeneradores
+    (SLACK_ZAFRA_CHANNEL_2) en la versión 'grande': columnas compactas en la hoja ancha.
+    Ya no se publica en #despacho-semanal. Versiones disponibles: 'compacta', 'grande', 'completa'."""
     c2 = os.environ.get('SLACK_ZAFRA_CHANNEL_2')
-    if c2:
-        out.append(('@2', c2, True))
-    return out
+    return [('@2', c2, 'grande')] if c2 else []
 
 
 def publicar(pngs, texto, canal):
@@ -71,19 +64,20 @@ def publicar(pngs, texto, canal):
     return True
 
 
-def imagen(r, d, temporada, completa=False):
+def imagen(r, d, temporada, version='compacta'):
     """Arma la imagen única (resumen + control por bloque, lado a lado)."""
     from render_zafra import ANCHO_COMPLETA
+    completa, grande = version == 'completa', version == 'grande'
     (IMG / str(d.year)).mkdir(parents=True, exist_ok=True)
-    suf = '_completa' if completa else ''
+    suf = '' if version == 'compacta' else f'_{version}'
 
     def render(alto):
         out = []
-        for k, pagina in enumerate(build_zafra(r, temporada, alto, completa), start=1):
+        for k, pagina in enumerate(build_zafra(r, temporada, alto, completa, grande), start=1):
             hp = IMG / str(d.year) / f'ZAFRA_{d:%Y%m%d}{suf}_{k}.html'
             hp.write_text(pagina, encoding='utf-8')
             png = hp.with_suffix('.png')
-            w = ANCHO_COMPLETA if (completa and k == 2) else 1080
+            w = ANCHO_COMPLETA if ((completa or grande) and k == 2) else 1080
             h = asyncio.run(to_png(hp, png, width=w)); hp.unlink()
             out.append((png, h))
         return out
@@ -112,22 +106,22 @@ def hacer_dia(d, est, pm, info, cambios, prueba=False, solo=None):
     txt = texto_zafra(r, est['temporada'])
     print(txt)
     if prueba:
-        print('  imágenes de prueba:', imagen(r, d, est['temporada']), imagen(r, d, est['temporada'], True))
+        print('  imagen de prueba:', imagen(r, d, est['temporada'], 'grande'))
         return True
     ok = True
     hechos = publicados()
-    for tag, canal, completa in canales():
+    for tag, canal, version in canales():
         if solo is None and f'{d:%Y%m%d}{tag}' in hechos:
             continue
         if solo is not None and tag != solo:
             continue
         try:
-            if publicar([imagen(r, d, est['temporada'], completa)], txt, canal):
+            if publicar([imagen(r, d, est['temporada'], version)], txt, canal):
                 anotar(f'{d:%Y%m%d}{tag}')
             else:
                 ok = False
         except Exception as e:                       # p. ej. el bot no está invitado al canal nuevo
-            print(f'  no se pudo publicar en {canal}: {e}'); ok = ok and tag != ''
+            print(f'  no se pudo publicar en {canal}: {e}'); ok = False
     return ok
 
 
@@ -139,7 +133,7 @@ def main():
         canal = sys.argv[sys.argv.index('--canal') + 1] if '--canal' in sys.argv else None
         solo = None if canal is None else ('@2' if canal == '2' else '')
         if solo is None and not prueba:
-            for tag, c, completa in canales():       # re-publicar: en todos los canales
+            for tag, c, version in canales():        # re-publicar: en todos los canales
                 hacer_dia(d, est, pm, info, [], solo=tag)
         else:
             hacer_dia(d, est, pm, info, [], prueba, solo=solo)
@@ -148,10 +142,12 @@ def main():
     hoy = dt.datetime.now(GT).date()
     if not prueba:                                    # días ya procesados que le faltan a algún canal (últimos 3)
         hechos = publicados()
-        for k in range(3):
+        for k in range(2):
             x = hasta - dt.timedelta(days=k)
-            for tag, canal, completa in canales():
-                if f'{x:%Y%m%d}' in hechos and f'{x:%Y%m%d}{tag}' not in hechos:
+            if x < dt.date(2026, 11, 26):             # el canal de ingenios arrancó con el 25-nov (publicado a mano)
+                continue
+            for tag, canal, version in canales():
+                if f'{x:%Y%m%d}{tag}' not in hechos:
                     print('Reintento de', x, 'en el canal', tag or '1')
                     hacer_dia(x, est, pm, info, [], solo=tag)
     d = hasta + dt.timedelta(days=1)
@@ -175,6 +171,7 @@ def main():
             break
         est['procesado_hasta'] = d.isoformat()
         Z.guardar_json('estado.json', est)
+        anotar(f'{d:%Y%m%d}')                         # día procesado (cada canal anota además su etiqueta)
         hubo = True
         d += dt.timedelta(days=1)
     return 0 if hubo or d >= hoy else 3
@@ -184,5 +181,6 @@ if __name__ == '__main__':
     if '--ayer-listo' in sys.argv:
         ayer = dt.datetime.now(GT).date() - dt.timedelta(days=1)
         hechos = publicados()
-        sys.exit(0 if all(f'{ayer:%Y%m%d}{tag}' in hechos for tag, _, _ in canales()) else 1)
+        listo = f'{ayer:%Y%m%d}' in hechos and all(f'{ayer:%Y%m%d}{tag}' in hechos for tag, _, _ in canales())
+        sys.exit(0 if listo else 1)
     sys.exit(main())

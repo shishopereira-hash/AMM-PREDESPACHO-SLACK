@@ -54,7 +54,7 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
   el intercambio MER no se compara; plantas en cascada/bloques/unidades se suman (Renace I–IV, INDE, Xacbal + Delta, Jaguar, Pantaleón...).
 
 ## Control de zafra (ingenios) — uso interno
-- Cada día a la **1:00 PM** se publica en **#despacho-semanal** la hoja *Control diario · Zafra*
+- Cada día a la **1:00 PM** se publica en **#ingenios-cogeneradores** la hoja *Control diario · Zafra*
   (estilo propio, oscuro verde/ámbar): energía, CVG, Pmax, factor de planta (rojo < 50 %, ámbar 50–100 %, verde ≥ 100 %) y acumulado por bloque,
   salidas y fallas del día (hoja Indisponibilidades + RSO) y alertas.
 - Alertas: inicio/fin de zafra; bloque sin generación; baja ≥ 15 % contra el día anterior; baja ≥ 10 % del total;
@@ -67,8 +67,8 @@ En "forzar" se puede poner el nombre exacto de un Excel para volver a publicarlo
 - Workflow: *Control de zafra en Slack* (1:00 PM por cron-job.org; respaldos de GitHub 1:45–5:45 PM; *Run workflow* con fecha `AAAAMMDD` para re-publicar).
   Para dispararlo desde cron-job.org: `POST https://api.github.com/repos/shishopereira-hash/AMM-PREDESPACHO-SLACK/actions/workflows/zafra.yml/dispatches`
   con el encabezado `Authorization: Bearer <token>` y el cuerpo `{"ref":"main"}`.
-- Canales: #despacho-semanal (`SLACK_CHANNEL_ID`, o `SLACK_ZAFRA_CHANNEL` si existe) recibe la versión compacta;
-  el canal de invitados (`SLACK_ZAFRA_CHANNEL_2`, C0CMC08J43U) recibe la versión para computadora con la tabla completa
-  (vs ayer, potencia real máxima y barras del factor de planta). Registro por canal en `data/publicados_zafra.txt` (`AAAAMMDD` y `AAAAMMDD@2`).
-  Re-publicar solo en el canal nuevo: `python scripts/zafra.py --fecha AAAAMMDD --canal 2`.
+- Canal: solo **#ingenios-cogeneradores** (`SLACK_ZAFRA_CHANNEL_2` = C0CMC08J43U), versión *grande*: resumen a la izquierda
+  y tabla compacta (CVG, energía, Pmax, factor de planta en color, acumulado, días) en una hoja ancha, 2720 px de ancho.
+  Desde el 26-nov-2026 ya **no** se publica en #despacho-semanal. Registro: `data/publicados_zafra.txt` (`AAAAMMDD` = día procesado,
+  `AAAAMMDD@2` = publicado en ingenios). También existe la versión 'completa' (con vs ayer, P. real y barras) por si se vuelve a pedir.
 - Prueba local: `python scripts/zafra.py --fecha 20261125 --prueba`.

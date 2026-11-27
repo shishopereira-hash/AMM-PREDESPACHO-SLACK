@@ -1,6 +1,6 @@
 name: Control de zafra en Slack
 
-# Hoja diaria de los ingenios en #despacho-semanal (compacta) y en el canal SLACK_ZAFRA_CHANNEL_2 (tabla completa).
+# Hoja diaria de los ingenios, solo en #ingenios-cogeneradores (SLACK_ZAFRA_CHANNEL_2). Ya no va a #despacho-semanal.
 # Sale todos los días a la 1:00 PM (cron-job.org dispara este workflow por la API de GitHub);
 # los horarios de abajo son respaldo (1:00 PM y 1:45–5:45 PM), y el botón "Run workflow"
 # (también lo puede disparar cron-job.org con la API de GitHub).
@@ -15,7 +15,7 @@ on:
         required: false
         default: ""
       canal:
-        description: "Solo con fecha: 1 = solo #despacho-semanal; 2 = solo #ingenios-cogeneradores; vacío = los dos canales"
+        description: "(ya no se usa: la hoja de zafra solo va a #ingenios-cogeneradores)"
         required: false
         default: ""
 

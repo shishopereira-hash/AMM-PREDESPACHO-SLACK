@@ -169,7 +169,7 @@ def _pagina(contenido, pie, ancho=1080):
 </div></body></html>"""
 
 
-def build_zafra(r, temporada, alto=1921, completa=False):
+def build_zafra(r, temporada, alto=1921, completa=False, grande=False):
     """Devuelve 2 páginas (HTML): resumen y control por bloque. Formato ancho, legible en el celular."""
     d, t = r['d'], r['tot']
     fp_dia = t['E'] / t['plena_dia'] if t['plena_dia'] else 0
@@ -198,7 +198,7 @@ def build_zafra(r, temporada, alto=1921, completa=False):
     p2 = _pagina(_cabeza(f'CONTROL DIARIO · ZAFRA {esc(temporada)}', 'Control por bloque',
                          f"{fecha} · día {r['dia_n']} de zafra") + f"""
  <div class="card" style="padding:18px 20px">{tabla(r['filas'], completa)}</div>""",
-                 '', ANCHO_COMPLETA if completa else 1080)
+                 '', ANCHO_COMPLETA if (completa or grande) else 1080)
     import re as _re
     f = 1.32
     head, sep, rest = p1.partition('<div id="page"')
@@ -216,6 +216,11 @@ def build_zafra(r, temporada, alto=1921, completa=False):
     p2 = p2.replace('<div class="card" style="padding:18px 20px"><table>', '<div class="card" style="padding:14px 12px"><table>')
     p2 = p2.replace('<div style="font-size:16px">desde', '<div style="font-size:19px">desde')
     p2 = p2.replace('GENERADORA SANTA LUCÍA</div>', 'G. SANTA LUCÍA</div>')
+    if grande and not completa:                    # tabla compacta en hoja ancha: todo más grande
+        p2 = (p2.replace("font-size:31px;text-align:right;vertical-align:middle;padding:14px 12px;", "font-size:38px;text-align:right;vertical-align:middle;padding:16px 16px;")
+                .replace('font-size:32px">', 'font-size:40px">').replace('font-size:20px;color', 'font-size:25px;color')
+                .replace('<div style="font-size:19px">desde', '<div style="font-size:24px">desde')
+                .replace("th{font-family:'IBM Plex Mono',monospace;font-size:20px;", "th{font-family:'IBM Plex Mono',monospace;font-size:24px;"))
     if completa:                                   # versión para computadora: textos grises más grandes
         p2 = (p2.replace('font-size:20px;color', 'font-size:23px;color').replace('<div style="font-size:19px">desde', '<div style="font-size:22px">desde')
                 .replace("th{font-family:'IBM Plex Mono',monospace;font-size:20px;", "th{font-family:'IBM Plex Mono',monospace;font-size:22px;"))
